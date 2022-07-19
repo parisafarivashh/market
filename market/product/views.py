@@ -1,20 +1,14 @@
-import json
-
-from rest_framework.generics import ListAPIView, CreateAPIView, \
-    GenericAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, GenericAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from .models import Product, Detail, SubCategory
+from .models import Product, Detail
 from .serializers import ProductSerializer, CreateProductSerializer, \
     DetailSerializer
 from user.filtering import IsOwnerProductFilterBackend
-
-from user.models import User
 
 
 class ListAllProducts(ListAPIView):

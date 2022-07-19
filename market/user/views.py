@@ -28,7 +28,7 @@ class Login(APIView):
         except User.DoesNotExist:
             raise UserNotFound
 
-        token, created = Token.objects.get_or_create(user)
+        token = Token.objects.get(user=user)
         user.is_authenticated = True
         user.save()
 
@@ -56,10 +56,10 @@ class SignUpView(APIView):
             }
             return Response(data=data, status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
-                user = User.objects.create(phone_number=obj.get('phone_number'))
-                user.date_joined = datetime.now()
-                user.save(update_fields=['date_joined'])
-                return Response(data=obj, status=status.HTTP_200_OK)
+            user = User.objects.create(phone_number=obj.get('phone_number'))
+            user.date_joined = datetime.now()
+            user.save(update_fields=['date_joined'])
+            return Response(data=obj, status=status.HTTP_200_OK)
 
 
 class WalletDetailAPIView(RetrieveAPIView):
