@@ -41,5 +41,5 @@ class TestViewUser(SetUp):
     def test_profile_get(self, set_up):
         response = self.client.get(path='/user/profile/', content_type='application/json')
         assert response.status_code == 200
-        assert len(response.data) == 4
+        assert len(response.data) == 5
 

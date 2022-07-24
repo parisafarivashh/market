@@ -78,3 +78,10 @@ class SubCategorySerializer(serializers.ModelSerializer):
         fields = ['name', 'category_id']
         depth = 1
 
+
+class CreateSubCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubCategory
+        fields = ['name', 'category_id']
+

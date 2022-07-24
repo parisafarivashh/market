@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'channels',
+    'django_extensions',
 
     'user',
     'admins',
     'product',
+    'order',
 ]
 
 REST_FRAMEWORK = {

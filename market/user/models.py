@@ -25,6 +25,11 @@ class User(models.Model):
         verbose_name_plural = 'user'
         db_table = 'User'
 
+    @property
+    def order(self):
+        order = self.orders.last()
+        return order
+
 
 class Token(Token):
     user = models.ForeignKey(User, related_name='auth_tokens', on_delete=models.CASCADE, verbose_name=_("User"))

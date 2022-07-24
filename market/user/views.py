@@ -13,6 +13,8 @@ from .serializers import UserPhoneNumberSerializer, WalletDetailSerializer, \
 from helpers import fa_to_eng_number
 from exceptions import UserNotFound
 
+from order.models import Order
+
 
 class Login(APIView):
     permission_classes = [AllowAny]
@@ -57,6 +59,7 @@ class SignUpView(APIView):
             return Response(data=data, status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
             user = User.objects.create(phone_number=obj.get('phone_number'))
+            Order.objects.create(user=user)
             user.date_joined = datetime.now()
             user.save(update_fields=['date_joined'])
             return Response(data=obj, status=status.HTTP_200_OK)

@@ -12,7 +12,7 @@ from .permissions import IsAdmin, ManageAdmins, IsOwnProfileAdmin
 from .serializers import CreateAdminSerializer, GetAdminSerializer, \
     UpdateAdminSerializer, GetAdminPermissionsSerializer, \
     AdminPermissionsSerializer, ColorSerializer, CategorySerializer, \
-    SubCategorySerializer
+    SubCategorySerializer, CreateSubCategorySerializer
 from product.models import Color, Category, SubCategory
 
 
@@ -173,7 +173,7 @@ class APICategory(GenericAPIView, CreateModelMixin, UpdateModelMixin, DestroyMod
 
 class APISubCategory(GenericAPIView, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin):
     permission_classes = [IsAuthenticated, IsAdmin]
-    serializer_class = SubCategorySerializer
+    serializer_class = CreateSubCategorySerializer
     lookup_field = 'id'
 
     def get_queryset(self):
