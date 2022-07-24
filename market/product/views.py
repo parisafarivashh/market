@@ -1,4 +1,5 @@
-from rest_framework.generics import ListAPIView, GenericAPIView
+from rest_framework.generics import ListAPIView, GenericAPIView, \
+    RetrieveAPIView, UpdateAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status
 
@@ -10,6 +11,8 @@ from .serializers import ProductSerializer, CreateProductSerializer, \
     DetailSerializer
 from user.filtering import IsOwnerProductFilterBackend
 
+from user.permissions import IsSeller
+
 
 class ListAllProducts(ListAPIView):
     permission_classes = [AllowAny]
@@ -20,6 +23,20 @@ class ListAllProducts(ListAPIView):
     search_fields = ['name', 'sub_category', '^seller_id__username']
     ordering_fields = ['id', 'name', 'sub_category', 'seller_id__username']
     ordering = ['name']
+
+
+class GetProduct(RetrieveAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+    lookup_field = 'id'
+
+
+class UpdateProduct(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsSeller]
+    serializer_class = CreateProductSerializer
+    queryset = Product.objects.all()
+    lookup_field = 'id'
 
 
 class ListProductOfSeller(ListAPIView):

@@ -10,6 +10,7 @@ class Category(models.Model):
     name = models.CharField(max_length=255, blank=False, null=False, verbose_name='دسته بندی')
 
     class Meta:
+        db_table = 'Category'
         verbose_name_plural = 'categories'
 
 
@@ -19,6 +20,7 @@ class SubCategory(models.Model):
     category_id = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories', verbose_name='دسته بندی')
 
     class Meta:
+        db_table = 'SubCategory'
         verbose_name_plural = 'sub categories'
 
 
@@ -41,6 +43,7 @@ class Color(models.Model):
     name = models.CharField(max_length=20, blank=False, null=False, verbose_name='name')
 
     class Meta:
+        db_table = 'Color'
         verbose_name_plural = 'color'
 
 
