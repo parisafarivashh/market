@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'admins',
     'product',
     'order',
+    'chat',
 ]
 
 REST_FRAMEWORK = {
