@@ -1,37 +1,47 @@
+from django.db import transaction
+from django.db.models import Q
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 
-from chat.serializers import ChatSerializer, MessageSerializer
-from chat.models import PrivateChat
+from chat.serializers import ChatSerializer, MessageSerializer, ListChatSerializer
+from chat.models import Message, ChatMember, Direct
+from rest_framework.response import Response
 
-from chat.models import Message
+from user.models import User
 
 
-class CreateChat(CreateAPIView):
+class CreateDirect(CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ChatSerializer
 
     def post(self, request, *args, **kwargs):
         try:
-            receiver = Users.objects.get(id=request.data['id'])
-        except Users.DoesNotExist:
+            receiver = User.objects.get(id=request.data['receiver'])
+        except User.DoesNotExist:
             raise NotFound
 
         first_name_group = f'chat_{self.request.user.id}_{receiver.id}'
         second_name_group = f'chat_{receiver.id}_{self.request.user.id}'
-        try:
-            chat = PrivateChat.objects.get(Q(title=first_name_group) | Q(title=second_name_group))
-        except PrivateChat.DoesNotExist:
-            serializer = self.serializer_class(request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.validated_data['creator'] = self.request.user
-            chat = PrivateChat.objects.create(**serializer.validated_data)
+        print(first_name_group)
+        print(second_name_group)
+        with transaction.atomic():
+            try:
+                chat = Direct.objects.get(Q(title=first_name_group) | Q(title=second_name_group))
+            except Direct.DoesNotExist:
+                serializer = self.serializer_class(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.validated_data['creator'] = self.request.user
+                serializer.validated_data['title'] = first_name_group
+                direct = Direct.objects.create(**serializer.validated_data)
 
-            ChatMember.objects.create(chat=chat.id, member=self.request.user.id)
-            ChatMember.objects.create(chat=chat.id, member=receiver.id)
+                ChatMember.objects.create(direct=direct, member=self.request.user)
+                ChatMember.objects.create(direct=direct, member=receiver)
+                print(serializer.data)
 
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_200_OK)
 
 
 class SendMessage(CreateAPIView):
@@ -39,13 +49,14 @@ class SendMessage(CreateAPIView):
     serializer_class = MessageSerializer
 
     def post(self, request, *args, **kwargs):
-        chat = PrivateChat.objects.get(id=request.data['chat'])
-        serializer = self.serializer_class(request.data)
+        direct = Direct.objects.get(id=request.data['direct'])
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['sender'] = self.request.user
-        serializer.validated_data['receiver'] = chat.receiver
+        serializer.validated_data['receiver'] = direct.receiver
 
         Message.objects.create(**serializer.validated_data)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
         # bayad channel name user ro save konam ta be on user mostagim payam
         # befrestam.... vase notification khobe
@@ -56,10 +67,18 @@ class SendMessage(CreateAPIView):
         #api ham hast ta history sho begire
 
 
+class ListAllChat(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ListChatSerializer
+
+    def get_queryset(self):
+        chat_member = ChatMember.objects.filter(member=self.request.user).values_list('direct', flat=True)
+        return Direct.objects.filter(id__in=chat_member)
 
 
-
-
-
-
+class ListMessageOfDirect(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MessageSerializer
+    queryset = Message.objects.all()
+    lookup_field = 'id'
 
