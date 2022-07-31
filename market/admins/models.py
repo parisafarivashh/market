@@ -1,4 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
@@ -52,7 +53,14 @@ class Admin(AbstractBaseUser):
         """ Is the User a member of staff? """
         return self.super_admin
 
+    def has_perm(self, perm, obj=None):
+       return True
+
+    def has_module_perms(self, app_label):
+       return True
+
     class Meta:
+        db_table = 'Admin'
         verbose_name_plural = 'admin'
 
 
