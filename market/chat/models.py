@@ -22,6 +22,7 @@ class Message(models.Model):
 
     class Meta:
         db_table = 'Message'
+        ordering = ['date_create']
 
 
 class ChatMember(models.Model):

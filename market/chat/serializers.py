@@ -3,11 +3,18 @@ from rest_framework import serializers
 from chat.models import Direct, Message
 
 
-class ChatSerializer(serializers.ModelSerializer):
+class CreateDirectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Direct
         fields = ['receiver']
+
+
+class DirectMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = '__all__'
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -18,6 +25,12 @@ class MessageSerializer(serializers.ModelSerializer):
             'sender': {'required': False},
             'receiver': {'required': False},
         }
+
+
+class UpdateMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['text']
 
 
 class LatestMessageSerializer(serializers.ModelSerializer):
