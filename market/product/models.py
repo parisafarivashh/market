@@ -6,8 +6,7 @@ from user.models import User
 
 
 class Category(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name='شناسه')
-    name = models.CharField(max_length=255, blank=False, null=False, verbose_name='دسته بندی')
+    name = models.CharField(max_length=255, blank=False, null=False)
 
     class Meta:
         db_table = 'Category'
@@ -15,9 +14,8 @@ class Category(models.Model):
 
 
 class SubCategory(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name='شناسه')
     name = models.CharField(max_length=255, blank=False, null=False)
-    category_id = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories', verbose_name='دسته بندی')
+    category_id = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
 
     class Meta:
         db_table = 'SubCategory'
@@ -25,7 +23,6 @@ class SubCategory(models.Model):
 
 
 class Product(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name='id')
     name = models.CharField(blank=False, null=False, max_length=100)
     description = models.JSONField(blank=True, null=True)
     rank = models.IntegerField(default=0, validators=[MaxValueValidator(5), MinValueValidator(0)])
@@ -38,7 +35,6 @@ class Product(models.Model):
 
 
 class Color(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name='id')
     code = models.CharField(max_length=20, blank=False, null=False, verbose_name='code of color')
     name = models.CharField(max_length=20, blank=False, null=False, verbose_name='name')
 
@@ -56,7 +52,6 @@ class Detail(models.Model):
         XXLARG = 4, _('XXL')
         XXXLARG = 5, _('XXXL')
 
-    id = models.AutoField(primary_key=True, verbose_name='id')
     color_id = models.ForeignKey(Color, on_delete=models.CASCADE, verbose_name='color')
     size = models.IntegerField(choices=Size.choices, default=Size.MEDIUM)
     price = models.FloatField(blank=False, null=False)
@@ -66,5 +61,4 @@ class Detail(models.Model):
     class Meta:
         db_table = 'Detail'
         verbose_name_plural = 'details of product'
-
 

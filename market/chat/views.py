@@ -5,9 +5,8 @@ from channels.layers import get_channel_layer
 from django.db import transaction
 from django.db.models import Q
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, \
-    RetrieveUpdateDestroyAPIView
-from rest_framework import viewsets, status, filters
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 
 from chat.serializers import CreateDirectSerializer, MessageSerializer, ListChatSerializer

@@ -13,7 +13,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'avatar', 'birth_date']
 
     def update(self, instance, validated_data):
-        super(UserProfileSerializer, self).update(validated_data)
+        super(UserProfileSerializer, self).update(instance, validated_data=validated_data)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             'update_user',
