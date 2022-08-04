@@ -12,7 +12,7 @@ from .permissions import IsAdmin, ManageAdmins, IsOwnProfileAdmin
 from .serializers import CreateAdminSerializer, GetAdminSerializer, \
     UpdateAdminSerializer, GetAdminPermissionsSerializer, \
     AdminPermissionsSerializer, ColorSerializer, CategorySerializer, \
-    SubCategorySerializer, CreateSubCategorySerializer
+    CreateSubCategorySerializer
 from product.models import Color, Category, SubCategory
 
 
@@ -71,7 +71,10 @@ class AdminProfileAPIView(RetrieveUpdateAPIView):
 
 
 class AdminPermissionsAPIView(GenericAPIView, RetrieveModelMixin):
-    permission_classes = [IsAuthenticated, IsAdmin, ManageAdmins]
+    """
+    API For Return Permission Of Admin
+    """
+    permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = GetAdminPermissionsSerializer
 
     def get_object(self):
@@ -97,9 +100,15 @@ class SetPermissionForAdminAPIView(GenericAPIView, RetrieveModelMixin, UpdateMod
 
 
 class APIColor(GenericAPIView, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin):
-    permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = ColorSerializer
     lookup_field = 'id'
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [IsAuthenticated, ]
+        else:
+            self.permission_classes = [IsAuthenticated, IsAdmin]
+        return super().get_permissions()
 
     def get_queryset(self):
         queryset = Color.objects.all()
@@ -136,9 +145,15 @@ class APIColor(GenericAPIView, CreateModelMixin, UpdateModelMixin, DestroyModelM
 
 
 class APICategory(GenericAPIView, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin):
-    permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = CategorySerializer
     lookup_field = 'id'
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [IsAuthenticated, ]
+        else:
+            self.permission_classes = [IsAuthenticated, IsAdmin]
+        return super().get_permissions()
 
     def get_queryset(self):
         queryset = Category.objects.all()
@@ -172,9 +187,15 @@ class APICategory(GenericAPIView, CreateModelMixin, UpdateModelMixin, DestroyMod
 
 
 class APISubCategory(GenericAPIView, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin):
-    permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = CreateSubCategorySerializer
     lookup_field = 'id'
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [IsAuthenticated, ]
+        else:
+            self.permission_classes = [IsAuthenticated, IsAdmin]
+        return super().get_permissions()
 
     def get_queryset(self):
         queryset = SubCategory.objects.all()
@@ -209,8 +230,4 @@ class APISubCategory(GenericAPIView, CreateModelMixin, UpdateModelMixin, Destroy
             return self.destroy(request, id)
         else:
             raise NotFound
-
-
-
-
 

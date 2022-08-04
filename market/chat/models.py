@@ -33,6 +33,3 @@ class ChatMember(models.Model):
         db_table = 'DirectMember'
         unique_together = [('direct', 'member'), ]
 
-
-
-

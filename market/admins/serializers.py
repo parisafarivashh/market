@@ -50,7 +50,8 @@ class UpdateAdminSerializer(serializers.ModelSerializer):
 class GetAdminPermissionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminPermissions
-        fields = ['id', 'admin_id']
+        fields = '__all__'
+        depth = 1
 
 
 class AdminPermissionsSerializer(serializers.ModelSerializer):
