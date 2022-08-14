@@ -70,6 +70,13 @@ def create_permissions(sender, instance=None, created=False, **kwargs):
         AdminPermissions.objects.create(admin_id=instance)
 
 
+@receiver(post_save, sender=Admin)
+def create_user(sender, instance=None, created=False, **kwargs):
+    from user.models import User
+    if created:
+        User.objects.create(phone_number=instance.phone_number)
+
+
 class AdminPermissions(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='id')
     manage_admins = models.BooleanField(default=False, verbose_name='manage other admin')

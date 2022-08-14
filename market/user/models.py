@@ -12,7 +12,7 @@ class User(models.Model):
 
     phone_regex = RegexValidator(regex=r'09(\d{9})$', message="Enter a valid phone_number")
     id = models.AutoField(primary_key=True, verbose_name='id')
-    username = models.CharField(max_length=255, verbose_name='name', unique=True)
+    username = models.CharField(max_length=255, verbose_name='name')
     avatar = models.ImageField(upload_to=user_directory_path, verbose_name='profile picture')
     phone_number = models.CharField(max_length=15, unique=True, validators=[phone_regex], verbose_name='phone number')
     email = models.EmailField(blank=True, null=True, verbose_name='email')

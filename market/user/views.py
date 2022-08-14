@@ -5,6 +5,7 @@ from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db import transaction
 
 from .models import User, Token
 from .permissions import IsUserProfile
@@ -14,6 +15,8 @@ from helpers import fa_to_eng_number
 from exceptions import UserNotFound
 
 from order.models import Order
+
+from .tasks import send_message_to_user
 
 
 class Login(APIView):
@@ -44,6 +47,7 @@ class Login(APIView):
 class SignUpView(APIView):
     permission_classes = [AllowAny]
 
+    @transaction.atomic
     def post(self, request):
         phone_number = fa_to_eng_number(request.data.get('phone_number'))
         serializer = UserPhoneNumberSerializer(data={'phone_number': phone_number})
@@ -62,6 +66,13 @@ class SignUpView(APIView):
             Order.objects.create(user=user)
             user.date_joined = datetime.now()
             user.save(update_fields=['date_joined'])
+
+            # the task does not get called until after the transaction is committed
+            text = 'Welcome to the market where you can easily buy and sell products'
+            transaction.on_commit(lambda: send_message_to_user.delay(
+                user.id,
+                text
+            ))
             return Response(data=obj, status=status.HTTP_200_OK)
 
 
