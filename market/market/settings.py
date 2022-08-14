@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django_filters',
     'channels',
     'django_extensions',
+    'django_celery_results',
+    'django_celery_beat',
 
     'user',
     'admins',
@@ -183,3 +185,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ASGI_APPLICATION = 'market.asgi.application'
+
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_BROKER_URL = 'amqp://myuser:mypassword@localhost:5672/myvhost'
