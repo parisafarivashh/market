@@ -19,6 +19,7 @@ class Message(models.Model):
     direct = models.ForeignKey(Direct, on_delete=models.CASCADE, related_name='messages')
     text = models.TextField(blank=True, null=False)
     date_create = models.DateTimeField(auto_now_add=True)
+    seen = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'Message'

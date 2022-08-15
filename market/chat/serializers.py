@@ -50,3 +50,9 @@ class ListChatSerializer(serializers.ModelSerializer):
         messages = Message.objects.filter(direct=obj.id).order_by('-date_create').first()
         return LatestMessageSerializer(messages).data
 
+
+class SeenMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = ['seen']
