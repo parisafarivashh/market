@@ -29,7 +29,7 @@ class SetUp:
     #     data = json.dumps({
     #         "name": "product",
     #         "sub_category": "1",
-    #         "details": [{"color_id": "1", "size": "1", "price": "200000", "count": "1"}]
+    #         "details": [{"color": "1", "size": "1", "price": "200000", "count": "1"}]
     #     })
     #     response = self.client.post(path='/product/create/',
     #                                 data=json.loads(data),

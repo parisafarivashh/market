@@ -22,7 +22,7 @@ class SetUp:
         self.access_token = json.loads(response.content).get("access")
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.access_token)
         self.category = Category.objects.create(name='category')
-        self.sub_category = SubCategory.objects.create(name='subcategory', category_id=self.category)
+        self.sub_category = SubCategory.objects.create(name='subcategory', category=self.category)
 
 
 class TestViewAdmin(SetUp):
@@ -107,7 +107,7 @@ class TestViewAdmin(SetUp):
     # def test_create_sub_category(self, set_up):
     #     data = json.dumps({
     #         'name': 'SubCategory',
-    #         'category_id': self.category
+    #         'category': self.category
     #     })
     #     print(data)
     #     response = self.client.post(path='/admins/sub-category/', data=data)

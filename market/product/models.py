@@ -15,7 +15,7 @@ class Category(models.Model):
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=255, blank=False, null=False)
-    category_id = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
 
     class Meta:
         db_table = 'SubCategory'
@@ -26,7 +26,7 @@ class Product(models.Model):
     name = models.CharField(blank=False, null=False, max_length=100)
     description = models.JSONField(blank=True, null=True)
     rank = models.IntegerField(default=0, validators=[MaxValueValidator(5), MinValueValidator(0)])
-    seller_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', verbose_name='seller')
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', verbose_name='seller')
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name='products', verbose_name='sub categories')
 
     class Meta:
@@ -52,11 +52,11 @@ class Detail(models.Model):
         XXLARG = 4, _('XXL')
         XXXLARG = 5, _('XXXL')
 
-    color_id = models.ForeignKey(Color, on_delete=models.CASCADE, verbose_name='color')
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, verbose_name='color')
     size = models.IntegerField(choices=Size.choices, default=Size.MEDIUM)
     price = models.FloatField(blank=False, null=False)
     count = models.IntegerField(blank=False, null=False)
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='product', related_name='details')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='product', related_name='details')
 
     class Meta:
         db_table = 'Detail'

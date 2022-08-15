@@ -4,12 +4,12 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from order.serializers import ItemOrderSerializer, UpdateItemOrderSerializer, ListOrderSerializer
-from order.models import ItemOrder, Order
+from .serializers import ItemOrderSerializer, UpdateItemOrderSerializer, ListOrderSerializer
+from .models import ItemOrder, Order
 from rest_framework.response import Response
 from product.models import Detail
-from rest_framework.viewsets import ReadOnlyModelViewSet
 
 
 class CreateItemOrder(GenericAPIView):
@@ -36,7 +36,7 @@ class CreateItemOrder(GenericAPIView):
             if detail.count < 0:
                 raise ValueError('order number not available')
             detail.save(update_fields=['count'])
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        return Response(data={"data": "Added successfully"}, status=status.HTTP_201_CREATED)
 
 
 class UpdateMyItemOrder(RetrieveUpdateDestroyAPIView):

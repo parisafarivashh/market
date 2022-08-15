@@ -12,6 +12,6 @@ class IsUserProfile(BasePermission):
 class IsSeller(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if obj.seller_id == request.user:
+        if obj.seller == request.user:
             return True
 
