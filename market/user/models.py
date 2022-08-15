@@ -63,3 +63,13 @@ def create_wallet(sender, instance=None, created=False, **kwargs):
     if created:
         Wallet.objects.create(user_id=instance)
 
+
+class Notifications(models.Model):
+    text = models.TextField(db_column='Text')
+    unread = models.BooleanField(db_column='Unread', default=False)
+    date = models.DateTimeField(db_column='Date', auto_now_add=True)
+    user = models.ForeignKey(User, models.CASCADE, db_column='UserID')
+
+    class Meta:
+        db_table = 'Notifications'
+

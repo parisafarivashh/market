@@ -1,20 +1,25 @@
 import json
 
+import ujson
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db import transaction
 from django.db.models import Q
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView, \
+    RetrieveUpdateDestroyAPIView
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import CreateDirectSerializer, MessageSerializer, ListChatSerializer
+from .permissions import CantSeenOwnMessage
+from .serializers import CreateDirectSerializer, MessageSerializer, \
+    ListChatSerializer, UpdateMessageSerializer, DirectMessageSerializer, \
+    SeenMessageSerializer
 from .models import Message, ChatMember, Direct
+
 from user.models import User
-from chat.serializers import UpdateMessageSerializer, DirectMessageSerializer
 
 
 class CreateDirect(CreateAPIView):
@@ -70,6 +75,17 @@ class SendMessage(CreateAPIView):
                         MessageSerializer(instance=message).data)
                 }
             )
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'User-Notification-{direct.receiver.id}',
+                {
+                    'type': 'send_notification',
+                    'text': ujson.dumps(
+                        dict(text=message.text, sender=self.request.user.phone_number)
+                    )
+                }
+
+            )
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         except Direct.DoesNotExist:
             return Response(data={'direct does not exist '}, status=status.HTTP_400_BAD_REQUEST)
@@ -94,6 +110,7 @@ class ListMessageOfDirect(APIView):
         except Direct.DoesNotExist:
             return Response(data={'Direct Does Not Exist'}, status=status.HTTP_400_BAD_REQUEST)
         message = Message.objects.filter(direct=direct)
+        message.update(seen=True)
 
         text = self.request.query_params.get('text', None)
         if text is not None:
@@ -106,6 +123,13 @@ class ListMessageOfDirect(APIView):
 class DeleteOrUpdateMessage(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UpdateMessageSerializer
+    queryset = Message.objects.all()
+    lookup_field = 'id'
+
+
+class SeenMessage(UpdateAPIView):
+    permission_classes = [IsAuthenticated, CantSeenOwnMessage]
+    serializer_class = SeenMessageSerializer
     queryset = Message.objects.all()
     lookup_field = 'id'
 
