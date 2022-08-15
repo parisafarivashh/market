@@ -7,6 +7,6 @@ urlpatterns = [
     path('', ListAllProducts.as_view()),
     path('me', ListProductOfSeller.as_view()),
     path('create', CreateProductAPI.as_view()),
-    path('<int:id>', GetProduct.as_view()),
-    path('update/<int:id>', UpdateProduct.as_view()),
+    path('detail/<int:id>', GetProduct.as_view()),
+    path('<int:id>', UpdateProduct.as_view()),
 ]

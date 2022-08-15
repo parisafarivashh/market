@@ -14,7 +14,7 @@ class ProductSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(ProductSerializer, self).to_representation(instance)
         data['sub_category'] = SubCategorySerializer(instance=instance.sub_category).data
-        details = Detail.objects.filter(product_id=instance.id)
+        details = Detail.objects.filter(product=instance.id)
         data['details'] = DetailSerializer(instance=details, many=True).data
         return data
 
@@ -32,7 +32,7 @@ class CreateProductSerializer(serializers.ModelSerializer):
     #     for detail in details:
     #         serializer_detail = DetailSerializer(data=detail)
     #         serializer_detail.is_valid(raise_exception=True)
-    #         serializer_detail.validated_data['product_id'] = product
+    #         serializer_detail.validated_data['product'] = product
     #         Detail.objects.create(**serializer_detail.validated_data)
     #     return product
 
@@ -42,29 +42,29 @@ class DetailSerializer(serializers.ModelSerializer):
         model = Detail
         fields = '__all__'
         extra_kwargs = {
-            'product_id': {'required': False},
+            'product': {'required': False},
         }
 
     def create(self, validated_data):
-        # validated_data['product_id'] = product
+        # validated_data['product'] = product
         Detail.objects.create(**validated_data)
 
     def to_representation(self, instance):
         data = super(DetailSerializer, self).to_representation(instance)
-        data['color_id'] = ColorSerializer(instance=instance.color_id).data
-        data['product_id'] = CreateProductSerializer(instance=instance.product_id).data
+        data['color'] = ColorSerializer(instance=instance.color).data
+        data['product'] = CreateProductSerializer(instance=instance.product).data
         return data
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Detail
-        fields = ['id', 'color_id', 'product_id', 'size']
+        fields = ['id', 'color', 'product', 'size']
 
     def to_representation(self, instance):
         data = super(OrderDetailSerializer, self).to_representation(instance)
-        data['color_id'] = ColorSerializer(instance=instance.color_id).data
-        data['product_id'] = CreateProductSerializer(instance=instance.product_id).data
+        data['color'] = ColorSerializer(instance=instance.color).data
+        data['product'] = CreateProductSerializer(instance=instance.product).data
         return data
 
 

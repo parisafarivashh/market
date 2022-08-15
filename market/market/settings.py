@@ -189,4 +189,5 @@ ASGI_APPLICATION = 'market.asgi.application'
 
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_RESULT_EXTENDED = True
 CELERY_BROKER_URL = 'amqp://myuser:mypassword@localhost:5672/myvhost'
