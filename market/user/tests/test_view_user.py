@@ -26,20 +26,20 @@ class TestViewUser(SetUp):
 
     @pytest.mark.django_db
     def test_detailWallet(self, set_up):
-        response = self.client.get(path='/user/wallet/', content_type='application/json')
+        response = self.client.get(path='/user/wallet', content_type='application/json')
         assert response.status_code == 200
         assert len(response.data) == 3
 
     @pytest.mark.django_db
     def test_profile_update(self, set_up):
         data = json.dumps({'username': 'sara'})
-        response = self.client.patch(path='/user/profile/', data=data, content_type='application/json')
+        response = self.client.patch(path='/user/profile', data=data, content_type='application/json')
         assert response.status_code == 200
         assert response.data['username'] == 'sara'
 
     @pytest.mark.django_db
     def test_profile_get(self, set_up):
-        response = self.client.get(path='/user/profile/', content_type='application/json')
+        response = self.client.get(path='/user/profile', content_type='application/json')
         assert response.status_code == 200
         assert len(response.data) == 5
 

@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'channels',
-    'django_extensions',
-    'django_celery_results',
-    'django_celery_beat',
+    # 'django_extensions',
+    # 'django_celery_results',
+    # 'django_celery_beat',
 
     'user',
     'admins',
