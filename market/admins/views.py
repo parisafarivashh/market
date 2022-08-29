@@ -78,7 +78,8 @@ class AdminPermissionsAPIView(GenericAPIView, RetrieveModelMixin):
     serializer_class = GetAdminPermissionsSerializer
 
     def get_object(self):
-        return AdminPermissions.objects.get(admin_id=self.request.user.id)
+        return AdminPermissions.objects.select_related('admin_id') \
+            .get(admin_id=self.request.user.id)
 
     def get(self, request):
         return self.retrieve(request)
@@ -91,7 +92,8 @@ class SetPermissionForAdminAPIView(GenericAPIView, RetrieveModelMixin, UpdateMod
 
     def get_object(self):
         try:
-            return AdminPermissions.objects.get(admin_id=self.kwargs.get('id'))
+            return AdminPermissions.objects.select_related('admin_id') \
+                .get(admin_id=self.kwargs.get('id'))
         except AdminPermissions.DoesNotExist:
             raise NotFound
 
@@ -198,7 +200,7 @@ class APISubCategory(GenericAPIView, CreateModelMixin, UpdateModelMixin, Destroy
         return super().get_permissions()
 
     def get_queryset(self):
-        queryset = SubCategory.objects.all()
+        queryset = SubCategory.objects.select_related('category').all()
         name = self.request.query_params.get('name')
         if name is not None:
             queryset = queryset.filter(name__startswith=name)

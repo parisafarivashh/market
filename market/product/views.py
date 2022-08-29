@@ -1,6 +1,6 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import ListAPIView, GenericAPIView, \
     RetrieveAPIView, UpdateAPIView, DestroyAPIView
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -15,7 +15,7 @@ from user.permissions import IsSeller
 class ListAllProducts(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('sub_category').all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['name', 'sub_category', 'seller']
     search_fields = ['name', 'sub_category', '^seller_id__username']
@@ -26,21 +26,21 @@ class ListAllProducts(ListAPIView):
 class GetProduct(RetrieveAPIView):
     permission_classes = [AllowAny]
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('sub_category').all()
     lookup_field = 'id'
 
 
 class UpdateProduct(UpdateAPIView, DestroyAPIView):
     permission_classes = [IsAuthenticated, IsSeller]
     serializer_class = CreateProductSerializer
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('sub_category').all()
     lookup_field = 'id'
 
 
 class ListProductOfSeller(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('sub_category').all()
     filter_backends = [IsOwnerProductFilterBackend]
 
 

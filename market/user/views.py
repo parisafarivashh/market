@@ -1,11 +1,11 @@
 from datetime import datetime
 
+from django.db import transaction
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db import transaction
 
 from .models import User, Token
 from .permissions import IsUserProfile

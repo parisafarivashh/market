@@ -3,8 +3,6 @@ from rest_framework import serializers
 from .models import Product, Detail, SubCategory
 from admins.serializers import SubCategorySerializer, ColorSerializer
 
-from user.serializers import SellerSerializer
-
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
