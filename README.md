@@ -1,5 +1,9 @@
 # market
-*
+* User can signup/login/logout
+  - the user`s phone number is unique
+  - wallet and basket are create as the same time as the user login
+  - welcome massage is sent to the user`s websocket
+  - user has the profile(user can update own profile)
 *
 *
 
