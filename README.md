@@ -47,6 +47,9 @@ docker-compose down -v
 ```bash
 docker-compose -f docker-compose.yml up -d --build
 ```
+```bash
+ docker-compose -f docker-compose-prod.yml down -v
+```
 * check for errors in the logs:
 ```bash
 docker-compose -f docker-compose.yml logs -f
