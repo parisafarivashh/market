@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .permissions import CantSeenOwnMessage
+from .permissions import CanNotSeenOwnMessage, OwnMessage
 from .serializers import CreateDirectSerializer, MessageSerializer, \
     ListChatSerializer, UpdateMessageSerializer, DirectMessageSerializer, \
     SeenMessageSerializer
@@ -59,36 +59,45 @@ class SendMessage(CreateAPIView):
     def post(self, request, *args, **kwargs):
         try:
             direct = Direct.objects.get(id=request.data['direct'])
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.validated_data['sender'] = self.request.user
-            serializer.validated_data['receiver'] = direct.receiver
-
-            message = Message.objects.create(**serializer.validated_data)
-
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                f'group_{direct.id}',
-                {
-                    'type': 'direct_message',
-                    'text': json.dumps(
-                        MessageSerializer(instance=message).data)
-                }
+            ChatMember.objects.get(
+                direct=request.data['direct'],
+                member=self.request.user
             )
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                f'User-Notification-{direct.receiver.id}',
-                {
-                    'type': 'send_notification',
-                    'text': ujson.dumps(
-                        dict(text=message.text, sender=self.request.user.phone_number)
-                    )
-                }
-
-            )
-            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         except Direct.DoesNotExist:
             return Response(data={'direct does not exist '}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ChatMember.DoesNotExist:
+            return Response(data={'You are not the member of this group'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['sender'] = self.request.user
+        serializer.validated_data['receiver'] = direct.receiver
+
+        message = Message.objects.create(**serializer.validated_data)
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'group_{direct.id}',
+            {
+                'type': 'direct_message',
+                'text': json.dumps(
+                    MessageSerializer(instance=message).data)
+            }
+        )
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'User-Notification-{direct.receiver.id}',
+            {
+                'type': 'send_notification',
+                'text': ujson.dumps(
+                    dict(text=message.text, sender=self.request.user.phone_number)
+                )
+            }
+
+        )
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ListAllChat(viewsets.ReadOnlyModelViewSet):
@@ -107,8 +116,16 @@ class ListMessageOfDirect(APIView):
     def get(self, request, id):
         try:
             direct = Direct.objects.get(id=id)
+            ChatMember.objects.get(
+                direct=id,
+                member=self.request.user
+            )
         except Direct.DoesNotExist:
-            return Response(data={'Direct Does Not Exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'Direct Does Not Exist'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except ChatMember.DoesNotExist:
+            return Response(data={'You are not the member of this group'},
+                            status=status.HTTP_400_BAD_REQUEST)
         message = Message.objects.filter(direct=direct)
         message.update(seen=True)
 
@@ -121,14 +138,14 @@ class ListMessageOfDirect(APIView):
 
 
 class DeleteOrUpdateMessage(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, OwnMessage]
     serializer_class = UpdateMessageSerializer
     queryset = Message.objects.all()
     lookup_field = 'id'
 
 
 class SeenMessage(UpdateAPIView):
-    permission_classes = [IsAuthenticated, CantSeenOwnMessage]
+    permission_classes = [IsAuthenticated, CanNotSeenOwnMessage]
     serializer_class = SeenMessageSerializer
     queryset = Message.objects.all()
     lookup_field = 'id'
