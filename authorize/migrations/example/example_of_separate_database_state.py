@@ -5,6 +5,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+    atomic = False
 
     dependencies = [
         ('authorize', '0004_alter_user_country_code_alter_user_phone_number'),
@@ -21,7 +22,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             database_operations=[migrations.RunSQL(
-                'ALTER TABLE "authorize_user" ADD CONSTRAINT  CONCURRENTLY' 
+                'ALTER TABLE "authorize_user" ADD CONSTRAINT  CONCURRENTLY'
                 '"Unique_Phone_Countrycode" UNIQUE ("phone_number", '
                 '"country_code")',
                 reverse_sql='drop constraint Unique_Phone_Countrycode;'

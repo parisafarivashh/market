@@ -4,6 +4,9 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin, AbstractBaseUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
 
 
@@ -58,9 +61,9 @@ class User(AbstractBaseUser, PermissionsMixin):
             )
         ]
 
-
-
-
-
-
+@receiver(signal=post_save, sender=User)
+def admin_created(self, sender, instance, created, **kwargs):
+    if created:
+        if instance.is_superuser is True:
+            Token.objects.create(user=instance)
 
