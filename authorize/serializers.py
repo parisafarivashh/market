@@ -13,3 +13,10 @@ class RegisterSerializers(serializers.ModelSerializer):
             'last_name': {'required': False},
         }
 
+
+class OtpSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['phone_number', 'country_code']
+
