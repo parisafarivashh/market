@@ -47,6 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     title = models.CharField(unique=True,max_length=100, blank=False, null=False)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
+    is_verify = models.BooleanField(default=False)
 
     objects = Manager()
 
@@ -62,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ]
 
 @receiver(signal=post_save, sender=User)
-def admin_created(self, sender, instance, created, **kwargs):
+def admin_created(sender, instance, created, **kwargs):
     if created:
         if instance.is_superuser is True:
             Token.objects.create(user=instance)
