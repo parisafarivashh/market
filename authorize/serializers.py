@@ -1,5 +1,8 @@
+from distutils.log import fatal
+
 from django.core.validators import RegexValidator
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import User
 
@@ -28,6 +31,15 @@ class BindSerializer(serializers.Serializer):
     otp_code = serializers.CharField(max_length=4)
     country_code = serializers.IntegerField()
     phone_number = serializers.CharField(validators=[phone_regex])
+
+    class Meta:
+        fields = ['phone_number', 'country_code', 'otp_code']
+
+
+class TokenObtainSerializer(serializers.Serializer):
+    otp_code = serializers.CharField(max_length=4)
+    phone_number = serializers.CharField()
+    country_code = serializers.IntegerField()
 
     class Meta:
         fields = ['phone_number', 'country_code', 'otp_code']
