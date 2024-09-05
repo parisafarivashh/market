@@ -8,12 +8,12 @@ from market.settings import SECRET_KEY
 
 def generate_totp(phone: str) -> str:
     base32_secret = _get_secrete_key(phone)
-    totp = pyotp.TOTP(base32_secret, digits=4)
+    totp = pyotp.TOTP(base32_secret, digits=4, interval=360)
     return totp.now()
 
 def validate_totp(phone: str, code: str) -> bool:
     base32_secret = _get_secrete_key(phone)
-    totp = pyotp.TOTP(base32_secret)
+    totp = pyotp.TOTP(base32_secret, digits=4, interval=360)
     is_valid = totp.verify(code)
     if not is_valid:
         raise ValidationError(detail={'otp_code': 'Otp Code Is Not Valid'})

@@ -48,6 +48,6 @@ class SendOtpViewTest(APITransactionTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data,
-            {'error': {'phone_number': ['Enter a valid phone_number']}}
+            {'error': {'phone_number': ['Enter a valid value.']}}
         )
 

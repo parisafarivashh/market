@@ -1,5 +1,4 @@
-from enum import unique
-
+from datetime import datetime, timezone
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
@@ -13,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 class Manager(BaseUserManager):
 
 
-    def create_user(self, phone_number, country_code, title, password):
+    def create_user(self, phone_number, country_code, title, password, **kwargs):
         if title is None:
             raise ValidationError(detail={'error': 'title is null'})
         if password is None:
@@ -27,15 +26,18 @@ class Manager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, phone_number, country_code, title, password):
+    def create_superuser(self, phone_number, country_code, title, password,
+                         **kwargs):
         user = self.create_user(
             phone_number=phone_number,
             country_code=country_code,
             title=title,
-            password=password
+            password=password,
+            **kwargs,
         )
         user.is_superuser = True
-        user.save(update_fields=['is_superuser'])
+        user.is_staff = True
+        user.save(update_fields=['is_superuser', 'is_staff'])
         return user
 
 
@@ -48,6 +50,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
     is_verify = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
 
     objects = Manager()
 

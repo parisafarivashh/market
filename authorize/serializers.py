@@ -18,29 +18,25 @@ class RegisterSerializers(serializers.ModelSerializer):
         }
 
 
-class OtpSerializers(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ['phone_number', 'country_code']
-
-
-
-class BindSerializer(serializers.Serializer):
-    phone_regex = RegexValidator(regex=r'9(\d{9})$')
-    otp_code = serializers.CharField(max_length=4)
-    country_code = serializers.IntegerField()
+class PhoneSerializer(serializers.Serializer):
+    phone_regex = RegexValidator(regex=r'^9(\d{9})$')
     phone_number = serializers.CharField(validators=[phone_regex])
 
     class Meta:
-        fields = ['phone_number', 'country_code', 'otp_code']
+        fields = ['phone_number', 'country_code']
 
 
-class TokenObtainSerializer(serializers.Serializer):
+class OtpSerializer(PhoneSerializer):
     otp_code = serializers.CharField(max_length=4)
-    phone_number = serializers.CharField()
-    country_code = serializers.IntegerField()
 
     class Meta:
         fields = ['phone_number', 'country_code', 'otp_code']
+
+
+class UserListSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'title', 'first_name', 'last_name', 'phone_number',
+                  'country_code', 'is_staff', 'date_joined']
 

@@ -1,18 +1,21 @@
 from django.db import transaction
+from django.db.models import Q
 from django.http import Http404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status, viewsets
+from rest_framework import mixins
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import get_object_or_404, GenericAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework_simplejwt.tokens import AccessToken
 
 from authorize.utils import generate_totp, validate_totp
+from .filters import FilterUser
 from .models import User
-from .serializers import RegisterSerializers, OtpSerializers, BindSerializer, \
-    TokenObtainSerializer
+from .serializers import RegisterSerializers, UserListSerializers, \
+    PhoneSerializer, OtpSerializer
 
 
 class RegisterView(generics.CreateAPIView):
@@ -22,8 +25,8 @@ class RegisterView(generics.CreateAPIView):
 
 
 class SendOtpView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = OtpSerializers
+    permission_classes = [AllowAny]
+    serializer_class = PhoneSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -43,7 +46,7 @@ class SendOtpView(generics.CreateAPIView):
 
 class VerifyPhoneView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class = BindSerializer
+    serializer_class = OtpSerializer
 
     @action(detail=False, methods=['post'])
     @transaction.atomic()
@@ -67,7 +70,7 @@ class VerifyPhoneView(viewsets.ViewSet):
 
 
 class LoginView(generics.CreateAPIView):
-    serializer_class = TokenObtainSerializer
+    serializer_class = OtpSerializer
 
     @transaction.atomic()
     def post(self, request, *args, **kwargs):
@@ -90,4 +93,25 @@ class LoginView(generics.CreateAPIView):
 
         token = AccessToken.for_user(user)
         return Response(data={'access': str(token)}, status=status.HTTP_200_OK)
+
+
+class ListUserView(mixins.ListModelMixin, GenericAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserListSerializers
+    filter_backends = [DjangoFilterBackend]
+    # filterset_fields = {
+    #     "title": ["icontains", "exact"], # worked on modelviewsets
+    #     "first_name": ["icontains"],
+    #     "last_name": ["icontains"],
+    #     "phone_number": ["exact"],
+    #     "is_staff": ["exact"],
+    # }
+    filterset_class = FilterUser
+
+    def get_queryset(self):
+        return User.objects.filter(~Q(id=self.request.user.id))
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
