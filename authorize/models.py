@@ -52,6 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_verify = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
+    is_blocked = models.BooleanField(default=False)
 
     objects = Manager()
 
@@ -65,6 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                 fields=['phone_number', 'country_code']
             )
         ]
+
 
 @receiver(signal=post_save, sender=User)
 def admin_created(sender, instance, created, **kwargs):
