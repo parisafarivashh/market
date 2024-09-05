@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django_filters',
 
     'authorize',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -122,7 +123,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
-    'EXCEPTION_HANDLER': 'market.exceptions.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'market.handler_exceptions.custom_exception_handler',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
