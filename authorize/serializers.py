@@ -1,4 +1,3 @@
-from distutils.log import fatal
 
 from django.core.validators import RegexValidator
 from rest_framework import serializers
