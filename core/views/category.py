@@ -1,7 +1,5 @@
 from rest_framework import generics
-from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from urllib3 import request
 
 from ..models.category import Category
 from ..serializers.category import CategoryListCreateSerializer
