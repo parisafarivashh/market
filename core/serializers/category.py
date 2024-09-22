@@ -7,7 +7,7 @@ class CategoryListCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['title', 'parent']
+        fields = ['id','title', 'parent']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

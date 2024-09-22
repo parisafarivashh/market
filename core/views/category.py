@@ -1,17 +1,27 @@
 from rest_framework import generics
+from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from urllib3 import request
 
 from ..models.category import Category
 from ..serializers.category import CategoryListCreateSerializer
 
 
 class CategoryListCreateApiView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = CategoryListCreateSerializer
+
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated()]
+        if self.request.method == 'Post':
+            permission_classes = [IsAuthenticated(), IsAdminUser()]
+
+        return permission_classes
+
 
     def get_queryset(self):
         removed_at = self.request.query_params.get('removed_at')
+        query = Category.objects.filter(parent__isnull=True)
         if removed_at is not None and removed_at.lower() == 'true':
-            return Category.objects.removed()
+            return query.removed()
 
-        return Category.objects.not_removed()
+        return query.not_removed()
