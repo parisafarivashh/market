@@ -16,15 +16,14 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['title', 'category', 'attributes', 'variants']
+        fields = ['id', 'title', 'category', 'attributes', 'variants', 'creator']
+        extra_kwargs = {'creator': {'required': False}}
 
 
     def create(self, validated_data):
         print(validated_data)
         attributes = validated_data.pop('attributes', None)
         variants = validated_data.pop('variants', None)
-
-        print(variants)
 
         product = Product.objects.create(**validated_data)
 
@@ -41,13 +40,27 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     category = CategoryListCreateSerializer(read_only=True)
+    creator_title = serializers.ReadOnlyField(source='creator.title')
 
     class Meta:
         model = Product
-        fields = ['title', 'category']
+        fields = ['id', 'title', 'category', 'creator', 'creator_title']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        data['attributes'] = AttributeSerializer(instance.attributes.all(), many=True).data
+        data['variants'] = VariantSerializer(instance.variants.all(), many=True).data
+        return data
+
+
+class ProductUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'category']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['category'] = CategoryListCreateSerializer(instance.category).data
         data['attributes'] = AttributeSerializer(instance.attributes.all(), many=True).data
         data['variants'] = VariantSerializer(instance.variants.all(), many=True).data
         return data
