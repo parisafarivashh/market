@@ -28,7 +28,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
         return permission_class
 
     def perform_create(self, serializer):
-        serializer.save('creator', self.request.user)
+        serializer.save(creator=self.request.user)
 
 
 class ProductGetUpdateView(generics.RetrieveUpdateDestroyAPIView):

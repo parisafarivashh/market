@@ -9,6 +9,7 @@ from authorize.serializers import UserListSerializers
 
 
 class UserListTest(APITransactionTestCase):
+    reset_sequences = True
 
     @pytest.mark.django_db
     def setUp(self):

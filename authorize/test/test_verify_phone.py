@@ -11,6 +11,7 @@ from authorize.models import User
 
 
 class VerifyPhoneNumberViewTest(APITransactionTestCase):
+    reset_sequences = True
 
     @pytest.mark.django_db
     def setUp(self):

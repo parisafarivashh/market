@@ -8,6 +8,7 @@ from authorize.models import User
 
 
 class SendOtpViewTest(APITransactionTestCase):
+    reset_sequences = True
 
     @pytest.mark.django_db
     def setUp(self):

@@ -10,6 +10,7 @@ from core.models import Category
 
 
 class CategoryViewTest(APITransactionTestCase):
+    reset_sequences = True
 
     @pytest.mark.django_db
     def setUp(self):
@@ -62,11 +63,11 @@ class CategoryViewTest(APITransactionTestCase):
                    {
                        'children': [{
                            'children': [],
-                           'id': 5,
-                           'parent': 4,
+                           'id': 2,
+                           'parent': 1,
                            'title': 'category 2'
                        }],
-                       'id': 4,'parent': None, 'title': 'category 1'
+                       'id': 1,'parent': None, 'title': 'category 1'
                    }
                ]
 

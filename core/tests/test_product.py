@@ -1,7 +1,4 @@
-from unicodedata import category
-
 import pytest
-from django.template.defaultfilters import title
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITransactionTestCase
@@ -12,6 +9,7 @@ from core.models import Product, Category
 
 
 class ProductViewTest(APITransactionTestCase):
+    reset_sequences = True  # Resets the auto-increment sequences at the start of each test
 
     @pytest.mark.django_db
     def setUp(self):
@@ -42,8 +40,8 @@ class ProductViewTest(APITransactionTestCase):
             "attributes":[{"title":"height", "value": "short"}]
         }
 
-        self.product1 = Product.objects.create(title='Product1', category=self.category1)
-        self.product2 = Product.objects.create(title='Product2', category=self.category1)
+        self.product1 = Product.objects.create(title='Product1', category=self.category1, creator=self.user)
+        self.product2 = Product.objects.create(title='Product2', category=self.category1, creator=self.user)
 
     def test_create_product(self):
         token = AccessToken.for_user(self.user)
@@ -53,7 +51,9 @@ class ProductViewTest(APITransactionTestCase):
         print(response.json())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         assert response.json() == {
+            'id': 3,
             'title': 'T-shirt',
+            'creator': 1,
             'category': 1,
             'attributes': [
                 {'id': 1, 'title': 'height', 'value': 'short','product': 3}
@@ -72,13 +72,43 @@ class ProductViewTest(APITransactionTestCase):
         assert response.json() ==  [
             {
                 'title': 'Product1',
-                'category': {'id': 2, 'title': 'category 1', 'parent': None, 'children': []},
+                'id': 1,
+                'creator': 1,
+                'creator_title': 'user',
+                'category': {'id': 1, 'title': 'category 1', 'parent': None, 'children': []},
                 'attributes': [],
                 'variants': []
             },
-            {'title': 'Product2',
-             'category': {'id': 2, 'title': 'category 1', 'parent': None, 'children': []},
-             'attributes': [], 'variants': []
+            {
+                'id': 2,
+                'title': 'Product2',
+                 'creator': 1,
+                 'creator_title': 'user',
+                 'category': {'id': 1, 'title': 'category 1', 'parent': None, 'children': []},
+                 'attributes': [], 'variants': []
              }
         ]
+
+    def test_get_product(self):
+        token = AccessToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(token)}')
+        response = self.client.get(f'{self.products}/{self.product1.id}')
+        assert response.json() ==  {
+            'id': 1,
+            'title': 'Product1',
+            'category': {'id': 1, 'title': 'category 1', 'parent': None, 'children': []},
+            'creator': 1,
+            'creator_title': 'user',
+            'attributes': [],
+            'variants': []
+        }
+
+    def test_delete_product(self):
+        token = AccessToken.for_user(self.admin)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(token)}')
+        response = self.client.delete(f'{self.products}/{self.product1.id}')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+
 

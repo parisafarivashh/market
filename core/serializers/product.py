@@ -27,30 +27,44 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
         product = Product.objects.create(**validated_data)
 
-        if attributes:
-            instance_attributes = [Attribute(product=product, **attribute) for attribute in attributes]
-            Attribute.objects.bulk_create(instance_attributes)
-
-        if variants:
-            instance_variant = [Variant(product=product, **variant) for variant in variants]
-            Variant.objects.bulk_create(instance_variant)
+        self._bulk_create_attributes(product, attributes)
+        self._bulk_create_variants(product, variants)
 
         return product
+
+    @staticmethod
+    def _bulk_create_attributes(product, attributes):
+        """Helper function to bulk create attributes."""
+        if attributes:
+            instance_attributes = \
+                [Attribute(product=product, **attr) for attr in attributes]
+            Attribute.objects.bulk_create(instance_attributes)
+
+    @staticmethod
+    def _bulk_create_variants(product, variants):
+        """Helper function to bulk create variants."""
+        if variants:
+            instance_variants = \
+                [Variant(product=product, **variant) for variant in variants]
+            Variant.objects.bulk_create(instance_variants)
 
 
 class ProductListSerializer(serializers.ModelSerializer):
     category = CategoryListCreateSerializer(read_only=True)
     creator_title = serializers.ReadOnlyField(source='creator.title')
+    attributes = AttributeSerializer(many=True, read_only=True, source='attributes.all')
+    variants = VariantSerializer(many=True, read_only=True, source='variants.all')
+
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'category', 'creator', 'creator_title']
+        fields = ['id', 'title', 'category', 'creator', 'creator_title', 'attributes', 'variants']
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['attributes'] = AttributeSerializer(instance.attributes.all(), many=True).data
-        data['variants'] = VariantSerializer(instance.variants.all(), many=True).data
-        return data
+    #def to_representation(self, instance):
+    #    data = super().to_representation(instance)
+    #    data['attributes'] = AttributeSerializer(instance.attributes.all(), many=True).data
+    #    data['variants'] = VariantSerializer(instance.variants.all(), many=True).data
+    #    return data
 
 
 class ProductUpdateSerializer(serializers.ModelSerializer):

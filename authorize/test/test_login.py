@@ -17,17 +17,16 @@ class LoginViewTest(APITransactionTestCase):
     def setUp(self):
         self.login = reverse('login')
 
-        self.user = User(
-            title='user',
+        self.user1 = User.objects.create_user(
+            title='user1',
             phone_number='9024356728',
             country_code='98',
             password='password',
         )
-        self.user.save()
 
         self.valid_payload = {
-            'phone_number': self.user.phone_number,
-            'country_code': self.user.country_code,
+            'phone_number': self.user1.phone_number,
+            'country_code': self.user1.country_code,
             'otp_code': '2034',
         }
         self.invalid_payload = {

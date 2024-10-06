@@ -1,16 +1,18 @@
-import json
+import pytest
 
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APITransactionTestCase
 
 
 User = get_user_model()
 
 
-class RegisterViewTest(APITestCase):
+class RegisterViewTest(APITransactionTestCase):
+    reset_sequences = True
 
+    @pytest.mark.django_db
     def setUp(self):
         self.register_url = reverse('register')
         self.valid_payload = {
