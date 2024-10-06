@@ -6,6 +6,6 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attribute
-        fields = ['title', 'value', 'product']
+        fields = ['id', 'title', 'value', 'product']
         extra_kwargs = {'product': {'required': False}}
 

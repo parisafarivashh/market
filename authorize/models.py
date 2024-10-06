@@ -59,14 +59,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'title'
     REQUIRED_FIELDS = ['country_code', 'phone_number']
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                name='Unique_Phone_Countrycode',
-                fields=['phone_number', 'country_code']
-            )
-        ]
-
 
 @receiver(signal=post_save, sender=User)
 def admin_created(sender, instance, created, **kwargs):
