@@ -20,8 +20,11 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        print(validated_data)
         attributes = validated_data.pop('attributes', None)
-        varaints = validated_data.pop('variants', None)
+        variants = validated_data.pop('variants', None)
+
+        print(variants)
 
         product = Product.objects.create(**validated_data)
 
@@ -29,8 +32,8 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             instance_attributes = [Attribute(product=product, **attribute) for attribute in attributes]
             Attribute.objects.bulk_create(instance_attributes)
 
-        if varaints:
-            instance_variant = [Variant(product=product, **variant) for variant in varaints]
+        if variants:
+            instance_variant = [Variant(product=product, **variant) for variant in variants]
             Variant.objects.bulk_create(instance_variant)
 
         return product
