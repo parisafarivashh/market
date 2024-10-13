@@ -24,7 +24,6 @@ class VariantCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         from .product import ProductSerializer
-
         data = super().to_representation(instance)
         data['product'] = ProductSerializer(instance.product).data
         return data

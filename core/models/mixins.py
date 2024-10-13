@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 
 
 class BaseModelMixin(models.Model):
@@ -7,4 +7,3 @@ class BaseModelMixin(models.Model):
 
     class Meta:
         abstract = True
-

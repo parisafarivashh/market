@@ -7,9 +7,10 @@ from ..models.product import Product
 from ..models.variant import Variant
 from ..serializers import ProductCreateSerializer, ProductListSerializer, ProductUpdateSerializer
 from ..permissions import IsOwn
+from .mixins import AtomicMixin
 
 
-class ProductListCreateView(generics.ListCreateAPIView):
+class ProductListCreateView(generics.ListCreateAPIView, AtomicMixin):
 
     def get_queryset(self):
         return Product.objects.filter(removed_at__isnull=True)
@@ -31,7 +32,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
         serializer.save(creator=self.request.user)
 
 
-class ProductGetUpdateView(generics.RetrieveUpdateDestroyAPIView):
+class ProductGetUpdateView(generics.RetrieveUpdateDestroyAPIView, AtomicMixin):
     lookup_field = 'id'
 
     def get_queryset(self):

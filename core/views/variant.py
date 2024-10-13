@@ -1,18 +1,17 @@
 from rest_framework import generics
-from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-
 from ..models import Variant
 from ..serializers.variant import VariantCreateSerializer
+from .mixins import AtomicMixin
 
 
-class VariantListCreateView(generics.ListCreateAPIView):
+class VariantListCreateView(generics.ListCreateAPIView, AtomicMixin):
     serializer_class = VariantCreateSerializer
     permission_classes = [IsAuthenticated]
     queryset = Variant.objects.not_removed()
 
 
-class VariantDetailsView(generics.RetrieveUpdateDestroyAPIView):
+class VariantDetailsView(generics.RetrieveUpdateDestroyAPIView, AtomicMixin):
     serializer_class = VariantCreateSerializer
     queryset = Variant.objects.not_removed()
     lookup_field = 'id'

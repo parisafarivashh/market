@@ -3,9 +3,10 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from ..models.category import Category
 from ..serializers.category import CategoryListCreateSerializer
+from .mixins import AtomicMixin
 
 
-class CategoryListCreateApiView(generics.ListCreateAPIView):
+class CategoryListCreateApiView(generics.ListCreateAPIView, AtomicMixin):
     serializer_class = CategoryListCreateSerializer
 
     def get_permissions(self):
