@@ -6,10 +6,10 @@ from .product import Product
 class AttributeManager(models.Manager):
 
     def not_removed(self):
-        self.filter(removed_at__isnull=True)
+        return self.filter(removed_at__isnull=True)
 
     def removed(self):
-        self.filter(removed_at__isnull=False)
+        return self.filter(removed_at__isnull=False)
 
 
 class Attribute(BaseModelMixin):
