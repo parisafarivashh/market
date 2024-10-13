@@ -3,6 +3,15 @@ from .mixins import BaseModelMixin
 from .product import Product
 
 
+class AttributeManager(models.Manager):
+
+    def not_removed(self):
+        self.filter(removed_at__isnull=True)
+
+    def removed(self):
+        self.filter(removed_at__isnull=False)
+
+
 class Attribute(BaseModelMixin):
     title = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
@@ -11,6 +20,8 @@ class Attribute(BaseModelMixin):
         on_delete=models.CASCADE,
         related_name='attributes'
     )
+
+    objects = AttributeManager()
 
     class Meta:
         db_table = 'attribute'

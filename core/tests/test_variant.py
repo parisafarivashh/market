@@ -12,8 +12,6 @@ class VariantViewTest(APITransactionTestCase):
 
     @pytest.mark.django_db
     def setUp(self):
-        self.variant = reverse('create_list_variant')
-
         self.user = User.objects.create_user(
             title='userr',
             phone_number='9024356728',
@@ -39,7 +37,6 @@ class VariantViewTest(APITransactionTestCase):
             "price": 1300,
             "color": "blue",
             "material": "linen",
-            "product": self.product.id,
         }
 
         self.variant1 = Variant.objects.create(
@@ -57,11 +54,14 @@ class VariantViewTest(APITransactionTestCase):
             material="linen",
             product=self.product,
         )
+        self.variant = reverse('create_list_variant', kwargs={'product_id': self.product.id})
 
 
     def test_create_variant(self):
         token = AccessToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(token)}')
+
+        self.variant = reverse('create_list_variant', kwargs={'product_id': self.product.id})
 
         response = self.client.post(self.variant, self.valid_payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -80,6 +80,7 @@ class VariantViewTest(APITransactionTestCase):
         assert len(response.json()) == 2
         for response in response.json():
             assert len(response) == 6
+            assert response['product']['id'] == self.product.id
 
     def test_update_variant(self):
         token = AccessToken.for_user(self.user)

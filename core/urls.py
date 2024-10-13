@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .views import CategoryListCreateApiView, ProductListCreateView, \
-    ProductGetUpdateView, VariantListCreateView, VariantDetailsView
+    ProductGetUpdateView, VariantListCreateView, VariantDetailsView, \
+    AttributeCreateView
 
 
 urlpatterns = [
@@ -11,8 +12,9 @@ urlpatterns = [
          name='list_create_product'),
     path('products/<str:id>', ProductGetUpdateView.as_view(),
          name='get_update_delete_products'),
-    path('variant', VariantListCreateView.as_view(), name='create_list_variant'),
-    path('variant/<str:id>', VariantDetailsView.as_view(), name='get_update_delete_variant')
+    path('products/<str:product_id>/variant', VariantListCreateView.as_view(), name='create_list_variant'),
+    path('products/<str:product_id>/variant/<str:id>', VariantDetailsView.as_view(), name='get_update_delete_variant'),
+    path('products/<str:product_id>/attribute', AttributeCreateView.as_view(), name='create_attribute')
 ]
 
 
