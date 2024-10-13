@@ -4,13 +4,12 @@ from ..models import Attribute, Variant
 from ..models.product import Product
 
 from .attribute import AttributeSerializer
-from .variant import VariantSerializer
-
 from  .category import CategoryListCreateSerializer
 
 
-
 class ProductCreateSerializer(serializers.ModelSerializer):
+    from .variant import VariantSerializer
+
     attributes = AttributeSerializer(many=True, required=False)
     variants = VariantSerializer(many=True, required=False)
 
@@ -50,6 +49,8 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    from .variant import VariantSerializer
+
     category = CategoryListCreateSerializer(read_only=True)
     creator_title = serializers.ReadOnlyField(source='creator.title')
     attributes = AttributeSerializer(many=True, read_only=True, source='attributes.all')
@@ -73,9 +74,20 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'category']
 
     def to_representation(self, instance):
+        from .variant import VariantSerializer
+
         data = super().to_representation(instance)
         data['category'] = CategoryListCreateSerializer(instance.category).data
         data['attributes'] = AttributeSerializer(instance.attributes.all(), many=True).data
         data['variants'] = VariantSerializer(instance.variants.all(), many=True).data
         return data
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    category = CategoryListCreateSerializer(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'category']
+
 

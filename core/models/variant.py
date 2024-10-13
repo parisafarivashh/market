@@ -3,6 +3,15 @@ from .mixins import BaseModelMixin
 from .product import Product
 
 
+class ManagerVariant(models.Manager):
+
+    def not_removed(self):
+        return self.filter(removed_at__isnull=True)
+
+    def removed(self):
+        return self.filter(removed_at__isnull=False)
+
+
 class Variant(BaseModelMixin):
     number = models.IntegerField()
     price = models.DecimalField(decimal_places=2, max_digits=10)
@@ -13,6 +22,8 @@ class Variant(BaseModelMixin):
         on_delete=models.CASCADE,
         related_name='variants'
     )
+
+    objects = ManagerVariant()
 
     class Meta:
         db_table = 'variant'
