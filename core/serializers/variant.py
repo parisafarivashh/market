@@ -20,3 +20,10 @@ class VariantSerializer(serializers.ModelSerializer):
     #def get_price(self, obj):
     #    return float(obj.price)
 
+
+class VariantDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Variant
+        fields = ['id', 'number', 'price', 'color', 'material']
+

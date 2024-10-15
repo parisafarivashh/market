@@ -3,6 +3,8 @@ from rest_framework import serializers
 from ..models.cart_item import CartItem
 from ..models.variant import Variant
 from ..models.cart import Cart
+from ..serializers.product import ProductSerializer
+from ..serializers.variant import VariantDetailSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -14,7 +16,6 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['variant']
 
-
     def create(self, validated_data):
         variant = validated_data['variant']
 
@@ -22,7 +23,6 @@ class CartItemSerializer(serializers.ModelSerializer):
             user=self.context['request'].user,
             status='open'
         )
-        cart.payable_amount += variant.price
 
         try:
             cart_item = CartItem.objects.get(variant=variant, cart=cart)
@@ -38,14 +38,13 @@ class CartItemSerializer(serializers.ModelSerializer):
                 quantity=1,
             )
 
-        cart.payable_amount += variant.price
         cart.save()
         return cart_item
 
 
-
 class CartItemListSerializer(serializers.ModelSerializer):
-
+    product = ProductSerializer(read_only=True)
+    variant = VariantDetailSerializer(read_only=True)
 
     class Meta:
         model = CartItem

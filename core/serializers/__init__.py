@@ -1,5 +1,5 @@
 from .attribute import AttributeSerializer
-from .variant import VariantSerializer
+from .variant import VariantSerializer, VariantDetailSerializer
 from .product import ProductCreateSerializer, ProductListSerializer, \
     ProductUpdateSerializer, ProductSerializer
 from .cart import CartDetailsSerializer
