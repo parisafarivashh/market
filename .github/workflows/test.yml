@@ -1,0 +1,65 @@
+name: Django application
+on:
+  push:
+      branches: [ "*" ]
+  pull_request:
+      branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: market
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.12.6
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      # - name: Run isort
+      #   uses: isort/isort-action@master
+
+      # - name: Run black
+      #   uses: psf/black@stable
+
+      # - name: Run flake8
+      #   run: flake8
+
+
+      - name: Run database migrations
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: market
+        run: |
+          poetry run python manage.py makemigrations
+          poetry run python manage.py migrate
+
+      - name: Run tests
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: market
+        run: poetry run pytest
