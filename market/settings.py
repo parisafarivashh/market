@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'django_filters',
+    'debug_toolbar',
 
     'authorize',
     'core',
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'authorize.middelwars.NotAllowedBlockUser',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'market.urls'
@@ -165,6 +167,8 @@ TWILIO_AUTH_TOKEN = 'c8baab39616c86aa714d22d00369cc0e'
 TWILIO_PHONE_NUMBER = '9031429689'
 
 
+INTERNAL_IPS = ['127.0.0.1']  # use in django debug toolbar
+
 sentry_sdk.init(
     dsn="https://ff45b5e1b9b9d9b0f6c49ef9b2721e23@o4508148699824128.ingest.us.sentry.io/4508148706508800",
     integrations=[DjangoIntegration()],
@@ -178,3 +182,40 @@ sentry_sdk.init(
     send_default_pii=True,
     environment='dev'
 )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        # Console handler for development and debugging
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        # Sentry handler for reporting critical issues to Sentry
+        'sentry': {
+            'level': 'ERROR',  # Capture only errors and above
+            'class': 'sentry_sdk.integrations.logging.EventHandler',
+        },
+    },
+    'loggers': {
+        # Default logger for Django
+        'django': {
+            'handlers': ['console', 'sentry'],
+            'level': 'DEBUG',  # Adjust the level as needed
+            'propagate': True,
+        },
+    },
+}
+
