@@ -13,6 +13,9 @@ from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 
 load_dotenv()
 
@@ -161,3 +164,17 @@ TWILIO_ACCOUNT_SID = 'AC8e507a1adb3d080dbceed8478015058e'
 TWILIO_AUTH_TOKEN = 'c8baab39616c86aa714d22d00369cc0e'
 TWILIO_PHONE_NUMBER = '9031429689'
 
+
+sentry_sdk.init(
+    dsn="https://ff45b5e1b9b9d9b0f6c49ef9b2721e23@o4508148699824128.ingest.us.sentry.io/4508148706508800",
+    integrations=[DjangoIntegration()],
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+    send_default_pii=True,
+    environment='dev'
+)
