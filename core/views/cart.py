@@ -59,6 +59,7 @@ class CartView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        # instance = self.request.user.carts.filter(status='open').first()
         instance = get_object_or_404(
             Cart,
             user=self.request.user,

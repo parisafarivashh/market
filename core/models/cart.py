@@ -1,3 +1,5 @@
+from dataclasses import fields
+
 from django.db import models
 from .cart_item import CartItem
 
@@ -14,7 +16,6 @@ class Cart(models.Model):
                 condition=models.Q(status='open'),
                 name="unique_open_cart_for_user")
         ]
-
 
     def add_item(self, variant):
         """Add an item in the cart."""
