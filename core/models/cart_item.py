@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 
 
 class CartItem(models.Model):
@@ -12,6 +12,8 @@ class CartItem(models.Model):
         db_table = 'cart_item'
 
     def update_quantity(self, quantity: int):
-        self.quantity = quantity
-        self.save(update_fields=['quantity'])
+        with transaction.atomic():
+            car_item = CartItem.objects.select_for_update().get(id=self.id)
+            car_item.quantity = quantity
+            car_item.save(update_fields=['quantity'])
 

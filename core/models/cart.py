@@ -8,6 +8,13 @@ class Cart(models.Model):
 
     class Meta:
         db_table = 'cart'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'status'],
+                condition=models.Q(status='open'),
+                name="unique_open_cart_for_user")
+        ]
+
 
     def add_item(self, variant):
         """Add an item in the cart."""
