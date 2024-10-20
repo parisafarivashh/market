@@ -24,20 +24,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             status='open'
         )
 
-        try:
-            cart_item = CartItem.objects.get(variant=variant, cart=cart)
-            cart_item.quantity += 1
-            cart_item.save()
-
-        except CartItem.DoesNotExist:
-            cart_item = CartItem.objects.create(
-                variant=variant,
-                product=variant.product,
-                cart=cart,
-                price=variant.price,
-                quantity=1,
-            )
-
+        cart_item = cart.add_item(variant)
         cart.save()
         return cart_item
 
@@ -58,4 +45,16 @@ class RemoveCartItemSerializer(serializers.Serializer):
     cart_item_id = serializers.PrimaryKeyRelatedField(
         queryset=CartItem.objects.all()
     )
+
+    def validate(self, data):
+        """Ensure that the cart item belongs to the cart."""
+        cart = data['cart_id']
+        cart_item = data['cart_item_id']
+
+        if cart_item.cart != cart:
+            raise serializers.ValidationError(detail=dict(
+                cart_item_id= "This cart item does not belong to the provided cart."
+            ))
+
+        return data
 
