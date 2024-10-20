@@ -1,5 +1,3 @@
-from itertools import product
-
 from django.db import models
 from .cart_item import CartItem
 
@@ -10,7 +8,6 @@ class Cart(models.Model):
 
     class Meta:
         db_table = 'cart'
-
 
     def add_item(self, variant):
         """Add an item in the cart."""
@@ -35,6 +32,4 @@ class Cart(models.Model):
         cart_items = CartItem.objects.filter(cart=self)
         cart_items_data = CartItemListSerializer(cart_items, many=True).data
         return dict(cart=cart_data, cart_items=cart_items_data)
-
-
 

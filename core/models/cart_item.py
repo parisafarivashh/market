@@ -11,3 +11,7 @@ class CartItem(models.Model):
     class Meta:
         db_table = 'cart_item'
 
+    def update_quantity(self, quantity: int):
+        self.quantity = quantity
+        self.save(update_fields=['quantity'])
+

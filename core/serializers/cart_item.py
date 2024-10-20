@@ -58,3 +58,7 @@ class RemoveCartItemSerializer(serializers.Serializer):
 
         return data
 
+
+class UpdateItemSerializer(RemoveCartItemSerializer):
+    quantity = serializers.IntegerField(min_value=1)
+

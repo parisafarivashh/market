@@ -3,7 +3,7 @@ from django.urls import path
 from .views import CategoryListCreateApiView, ProductListCreateView, \
     ProductGetUpdateView, VariantListCreateView, VariantDetailsView, \
     AttributeCreateView, AttributeDetailsView, AddCartView, CartView, \
-    RemoveCartView
+    RemoveCartView, UpdateCartView
 
 
 urlpatterns = [
@@ -19,6 +19,7 @@ urlpatterns = [
     path('products/<str:product_id>/attribute/<str:id>', AttributeDetailsView.as_view(), name='get_update_delete_attribute'),
 
     path('cart/add', AddCartView.as_view(), name='add_variant_in_cart'),
+    path('cart/update', UpdateCartView.as_view(), name='update_item_in_cart'),
     path('cart/remove', RemoveCartView.as_view(), name='remove_item_in_cart'),
     path('cart', CartView.as_view(), name='list_cart'),
 ]

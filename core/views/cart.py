@@ -5,11 +5,10 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from . import AtomicMixin
-from ..serializers.cart import CartDetailsSerializer
-from ..serializers.cart_item import CartItemSerializer, CartItemListSerializer, \
+from ..serializers.cart_item import CartItemSerializer, UpdateItemSerializer, \
     RemoveCartItemSerializer
-from ..models.cart_item import CartItem
 from ..models.cart import Cart
+from ..models.cart_item import CartItem
 
 
 class AddCartView(APIView, AtomicMixin):
@@ -22,6 +21,23 @@ class AddCartView(APIView, AtomicMixin):
 
         data = cart_item.cart.get_cart_data()
         return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+class UpdateCartView(APIView, AtomicMixin):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, *args, **kwargs):
+        serializer = UpdateItemSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        cart_item = get_object_or_404(
+            CartItem,
+            cart__id=serializer.data['cart_id'],
+            id=serializer.data['cart_id'],
+        )
+        cart_item.update_quantity(serializer.data['quantity'])
+        data = cart_item.cart.get_cart_data()
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class RemoveCartView(APIView, AtomicMixin):
