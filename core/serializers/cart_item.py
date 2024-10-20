@@ -50,3 +50,12 @@ class CartItemListSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'cart_id', 'price', 'product', 'variant', 'quantity']
 
+
+class RemoveCartItemSerializer(serializers.Serializer):
+    cart_id = serializers.PrimaryKeyRelatedField(
+        queryset=Cart.objects.all()
+    )
+    cart_item_id = serializers.PrimaryKeyRelatedField(
+        queryset=CartItem.objects.all()
+    )
+
