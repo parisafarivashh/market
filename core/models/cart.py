@@ -4,10 +4,26 @@ from django.db import models
 from .cart_item import CartItem
 
 
+class CartQueryset(models.QuerySet):
+
+    def get_done_status(self):
+        return self.filter(status='done')
+
+class CartManager(models.Manager):
+
+    def get_queryset(self):
+        return CartQueryset(model=self.model, using=self._db)
+
+    def done_status(self):
+        return self.get_queryset().get_done_status()
+
+
 class Cart(models.Model):
     user = models.ForeignKey('authorize.User', on_delete=models.PROTECT, related_name='carts')
     status = models.CharField(max_length=150, null=False, blank=False)
+    order_date = models.DateField(null=True, blank=True)
 
+    objects = CartManager()
     class Meta:
         db_table = 'cart'
         constraints = [
