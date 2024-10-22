@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from .mixins import BaseModelMixin
 from .product import Product
 
@@ -28,3 +28,8 @@ class Variant(BaseModelMixin):
     class Meta:
         db_table = 'variant'
 
+    def decrease_numer(self, number: int):
+        with transaction.atomic():
+            variant = Variant.objects.get(id=self.id)
+            variant.number = models.F('number') - number
+            variant.save(update_fields=['number'])

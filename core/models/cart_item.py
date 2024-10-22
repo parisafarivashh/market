@@ -13,7 +13,7 @@ class CartItem(models.Model):
 
     def update_quantity(self, quantity: int):
         with transaction.atomic():
-            car_item = CartItem.objects.select_for_update().get(id=self.id)
-            car_item.quantity = quantity
+            car_item = CartItem.objects.get(id=self.id)
+            car_item.quantity = models.F('quantity') + quantity
             car_item.save(update_fields=['quantity'])
 

@@ -8,7 +8,8 @@ from django.db import transaction
 
 from ..views import AtomicMixin
 from ..serializers import CartDetailsSerializer
-from ..models import Cart
+from ..models.cart import Cart
+from ..models.cart_item import CartItem
 
 
 class PaymentView(APIView, AtomicMixin):
@@ -20,6 +21,11 @@ class PaymentView(APIView, AtomicMixin):
             cart.status = 'done'
             cart.order_date = datetime.today().date()
             cart.save(update_fields=['status', 'order_date'])
+
+            cart_items = cart.cartItems.all()
+            for cart_item in cart_items:
+                cart_item.variant.decrease_numer(cart_item.quantity)
+
             data = CartDetailsSerializer(cart).data
             Cart.objects.create(status='open', user=self.request.user)
             return Response(data=data, status=status.HTTP_200_OK)
