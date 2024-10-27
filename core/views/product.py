@@ -1,7 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.db import transaction
+
+from ..filterset import ProductFilter
 from ..models import Attribute
 from ..models.product import Product
 from ..models.variant import Variant
@@ -11,6 +14,8 @@ from .mixins import AtomicMixin
 
 
 class ProductListCreateView(generics.ListCreateAPIView, AtomicMixin):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
 
     def get_queryset(self):
         return Product.objects.filter(removed_at__isnull=True)

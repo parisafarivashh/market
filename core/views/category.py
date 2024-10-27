@@ -1,6 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
+from ..filterset import CategoryFilter
 from ..models.category import Category
 from ..serializers.category import CategoryListCreateSerializer
 from .mixins import AtomicMixin
@@ -8,6 +10,8 @@ from .mixins import AtomicMixin
 
 class CategoryListCreateApiView(generics.ListCreateAPIView, AtomicMixin):
     serializer_class = CategoryListCreateSerializer
+    django_filters = [DjangoFilterBackend]
+    filterset_class = CategoryFilter
 
     def get_permissions(self):
         permission_classes = [IsAuthenticated()]
