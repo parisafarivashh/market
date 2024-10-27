@@ -1,7 +1,7 @@
-from itertools import product
-
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
+from ..filterset import AttributeFilter
 from ..models.attribute import Attribute
 from ..serializers.attribute import AttributeSerializer
 from .mixins import AtomicMixin
@@ -14,6 +14,14 @@ class AttributeCreateView(generics.ListCreateAPIView, AtomicMixin):
     def get_queryset(self):
         queryset = Attribute.objects.not_removed() \
             .filter(product__id=self.kwargs['product_id'])
+
+        filter_set = AttributeFilter(
+            data=self.request.query_params,
+            queryset=queryset
+        )
+        if filter_set.is_valid():
+            queryset = filter_set.qs
+
         return queryset
 
 

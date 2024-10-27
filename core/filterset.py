@@ -1,6 +1,6 @@
 import django_filters
 
-from .models import Product, Category
+from .models import Product, Category, Attribute
 from .models.cart import Cart
 from django.contrib.postgres.search import TrigramSimilarity, SearchVector, \
     SearchQuery, SearchRank
@@ -49,4 +49,12 @@ class CategoryFilter(BaseSearchFilter):
     class Meta:
         model = Category
         fields = ['title']
+
+
+class AttributeFilter(BaseSearchFilter):
+    value = django_filters.CharFilter(field_name='value', method='search_title')
+
+    class Meta:
+        model = Attribute
+        fields = ['value']
 
