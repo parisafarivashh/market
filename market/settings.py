@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_filters',
     'debug_toolbar',
     'django_extensions',
+    'django.contrib.postgres'
 
     'authorize',
     'core',

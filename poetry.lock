@@ -354,6 +354,16 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-contrib-postgres"
+version = "0.0.1"
+description = "Backport of django.contrib.postgres"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-contrib-postgres-0.0.1.tar.gz", hash = "sha256:4c8b57efd93ed0a37ba6fb457c69993ef3f2a51c560c0dd7b1b3cfb78810b0ff"},
+]
+
+[[package]]
 name = "django-debug-toolbar"
 version = "4.4.6"
 description = "A configurable set of panels that display various debug information about the current request/response."
@@ -1317,4 +1327,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.12.6"
-content-hash = "65049686219b6fdc5788078417c3c432bb6f717911440b0294a9ec57150bbd20"
+content-hash = "c7fc9a33cabe5d35f9d48e533c24471a4936f8428cbbdc1199619833b6d595b7"
