@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from ..models.cart_item import CartItem
 from ..models.variant import Variant
@@ -24,8 +25,13 @@ class CartItemSerializer(serializers.ModelSerializer):
             status='open'
         )
 
+        if variant.number == 0:
+            #ToDo send notif to user
+            raise ValidationError(detail=dict(title=variant.product.title, count=variant.number))
+
         cart_item = cart.add_item(variant)
         cart.save()
+
         return cart_item
 
 

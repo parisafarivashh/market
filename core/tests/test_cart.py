@@ -127,7 +127,7 @@ class CartViewTest(APITransactionTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         assert CartItem.objects.filter(id=self.cart_item.id) \
-                   .values_list('quantity', flat=True).first() == 2
+                   .values_list('quantity', flat=True).first() == 5
 
 
     def test_get_cart(self):

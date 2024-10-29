@@ -5,4 +5,5 @@ from .product import ProductCreateSerializer, ProductListSerializer, \
 from .cart import CartDetailsSerializer
 from .cart_item import CartItemSerializer, CartItemListSerializer, \
     RemoveCartItemSerializer, UpdateItemSerializer
+from .payment import PaymentFailSerializer
 

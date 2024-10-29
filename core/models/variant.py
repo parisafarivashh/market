@@ -31,6 +31,6 @@ class Variant(BaseModelMixin):
 
     def decrease_numer(self, number: int):
         with transaction.atomic():
-            variant = Variant.objects.get(id=self.id)
+            variant = Variant.objects.select_for_update().get(id=self.id)
             variant.number = models.F('number') - number
             variant.save(update_fields=['number'])
