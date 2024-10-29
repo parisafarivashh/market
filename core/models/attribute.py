@@ -1,4 +1,6 @@
 from django.db import models
+from django.dispatch import receiver
+
 from .mixins import BaseModelMixin
 from .product import Product
 

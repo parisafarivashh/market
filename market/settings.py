@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 
     'authorize',
     'core',
+    'analytics',
 ]
 
 MIDDLEWARE = [
