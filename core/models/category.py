@@ -1,7 +1,5 @@
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 
-from analytics.models import Activity
 from .mixins import BaseModelMixin
 
 
