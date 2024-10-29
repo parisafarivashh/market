@@ -5,12 +5,12 @@ from ..serializers.variant import VariantSerializer
 from .mixins import AtomicMixin
 
 
-class VariantListCreateView(generics.ListCreateAPIView, AtomicMixin):
+class VariantListCreateView(AtomicMixin, generics.ListCreateAPIView):
     serializer_class = VariantSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Variant.objects.not_removed() \
+        queryset = Variant.objects.not_removed().select_related('product') \
             .filter(product__id=self.kwargs['product_id'])
 
         return queryset
@@ -19,7 +19,7 @@ class VariantListCreateView(generics.ListCreateAPIView, AtomicMixin):
         serializer.save(product_id=self.kwargs['product_id'])
 
 
-class VariantDetailsView(generics.RetrieveUpdateDestroyAPIView, AtomicMixin):
+class VariantDetailsView(AtomicMixin, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = VariantSerializer
     queryset = Variant.objects.not_removed()
     lookup_field = 'id'

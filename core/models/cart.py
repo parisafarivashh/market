@@ -53,7 +53,7 @@ class Cart(models.Model):
         from ..serializers.cart_item import CartItemListSerializer
 
         cart_data = CartDetailsSerializer(instance=self).data
-        cart_items = CartItem.objects.filter(cart=self)
+        cart_items = CartItem.objects.select_related().filter(cart=self)
         cart_items_data = CartItemListSerializer(cart_items, many=True).data
         return dict(cart=cart_data, cart_items=cart_items_data)
 

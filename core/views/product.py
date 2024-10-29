@@ -18,7 +18,7 @@ class ProductListCreateView(generics.ListCreateAPIView, AtomicMixin):
     filterset_class = ProductFilter
 
     def get_queryset(self):
-        return Product.objects.filter(removed_at__isnull=True)
+        return Product.objects.select_related('category').filter(removed_at__isnull=True)
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == 'POST':
@@ -41,7 +41,7 @@ class ProductGetUpdateView(generics.RetrieveUpdateDestroyAPIView, AtomicMixin):
     lookup_field = 'id'
 
     def get_queryset(self):
-        return Product.objects.filter(removed_at__isnull=True)
+        return Product.objects.select_related('category').filter(removed_at__isnull=True)
 
     @transaction.atomic()
     def dispatch(self, request, *args, **kwargs):

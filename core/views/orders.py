@@ -14,5 +14,5 @@ class OrderView(generics.ListAPIView):
     filterset_class = CartFilter
 
     def get_queryset(self):
-        return Cart.objects.done_status().filter(user=self.request.user)
+        return Cart.objects.done_status().select_related('user').filter(user=self.request.user)
 
