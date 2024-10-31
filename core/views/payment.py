@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.db.models import F
 
+from ..tasks import notification_payment
 from ..views import AtomicMixin
 from ..serializers import PaymentFailSerializer, CartDetailsSerializer
 from ..models.cart import Cart
@@ -41,5 +42,6 @@ class PaymentView(APIView, AtomicMixin):
 
             data = CartDetailsSerializer(cart).data
             Cart.objects.create(status='open', user=self.request.user)
+            notification_payment.apply_async(args=(cart.id,))
             return Response(data=data, status=status.HTTP_200_OK)
 

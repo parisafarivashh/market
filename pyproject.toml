@@ -20,6 +20,9 @@ django-debug-toolbar = "^4.4.6"
 django-extensions = "^3.2.3"
 ipython = "^8.29.0"
 django-contrib-postgres = "^0.0.1"
+celery = "^5.4.0"
+rabbitmq-server = "^0.0.1"
+redis = "^5.2.0"
 
 [tool.poetry.group.dev.dependencies]
 djangorestframework = "^3.15.2"

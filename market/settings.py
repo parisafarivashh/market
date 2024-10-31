@@ -14,6 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
 
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'django_filters',
     'debug_toolbar',
     'django_extensions',
+    'celery',
 
     'authorize',
     'core',
@@ -173,7 +175,7 @@ INTERNAL_IPS = ['127.0.0.1']  # use in django debug toolbar
 
 sentry_sdk.init(
     dsn="https://ff45b5e1b9b9d9b0f6c49ef9b2721e23@o4508148699824128.ingest.us.sentry.io/4508148706508800",
-    integrations=[DjangoIntegration()],
+    integrations=[DjangoIntegration(), CeleryIntegration()],
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for tracing.
     traces_sample_rate=1.0,
@@ -218,6 +220,17 @@ LOGGING = {
             'level': 'DEBUG',  # Adjust the level as needed
             'propagate': True,
         },
+        'celery': {
+            'handlers': ['console', 'sentry'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
     },
 }
 
+
+# region rabbitmq
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Example using Redis
+
+# endregion
