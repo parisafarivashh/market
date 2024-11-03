@@ -1,7 +1,7 @@
-from inspect import signature
+from celery import signature
 
 import pika
-import json
+import ujson
 import logging
 import traceback
 from celery import Task
@@ -16,7 +16,7 @@ class MarketCelery(Task):
     default_retry_delay = 2
     soft_time_limit = None
     needs_token = False
-    max_retries = 100
+    max_retries = 2
     time_limit = None
     acks_late = True
 
@@ -33,8 +33,8 @@ class MarketCelery(Task):
         return super().__call__(*args, **kwargs)
 
     def on_retry(self, exc, task_id, args, kwargs, einfo):
-        if self.retry == 0:
-            error_detail = json.dumps(dict(
+        if self.request.retries == 0:
+            error_detail = ujson.dumps(dict(
                 exc=exc.__doc__,
                 task_id=task_id,
                 stackTrace=traceback.format_exc(),
@@ -42,7 +42,7 @@ class MarketCelery(Task):
             logger.error(error_detail)
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        error_detail = json.dumps(dict(
+        error_detail = ujson.dumps(dict(
             exc=exc.__doc__,
             task_id=task_id,
             stackTrace=traceback.format_exc(),
@@ -51,15 +51,15 @@ class MarketCelery(Task):
 
         try:
             backup_task = CeleryBackupMessage(
-                args=json.dumps(args),
-                kwargs=json.dumps(kwargs),
+                args=ujson.dumps(args),
+                kwargs=ujson.dumps(kwargs),
                 task_name=self.name,
                 fail_reason=error_detail,
                 task_id=task_id,
             )
             CeleryRequeue().sender(backup_task.to_json())
         except Exception as exc_:  # pragma: no cover
-            logger.critical(json.dumps(dict(
+            logger.critical(ujson.dumps(dict(
                 message=exc_.__doc__,
                 stackTrace=traceback.format_exc(),
                 taskId=task_id,
@@ -105,7 +105,7 @@ class CeleryBackupMessage:
         Returns:
             str: JSON string representation of the object.
         """
-        return json.dumps(
+        return ujson.dumps(
             self.to_dict(),
             escape_forward_slashes=False,
             indent=4,
@@ -122,50 +122,43 @@ class CeleryBackupMessage:
         Returns:
             object: An instance of the cls constructed from the JSON message.
         """
-        return cls(**json.loads(json_message))
-
+        return cls(**ujson.loads(json_message))
 
 
 class CeleryRequeue(metaclass=Singleton):
 
     def __init__(self):
-        self.host = 'settings.rabbitmq.host'
-        self.port = 'settings.rabbitmq.port'
-        self.username = 'settings.rabbitmq.account.username'
-        self.password = 'settings.rabbitmq.account.password'
-        self.exchange_name = 'settings.celery_requeue.exchange.name'
-        self.exchange_type = 'settings.celery_requeue.exchange.type'
-        self.queue_name = 'settings.celery_requeue.queue.name'
-        self.routing_key = 'settings.celery_requeue.queue.name'
+        self.host = 'localhost'
+        self.exchange_name = 'market_celery_requeue'
+        self.exchange_type = 'direct'
+        self.queue_name = 'market_requeue'
+        self.routing_key = 'market_requeue'
         self.heartbeat = 2
-        self.max_priority = 'settings.celery_requeue.max_priority'
+        self.max_priority = 10
         self._create_connection()
 
     def _create_connection(self):
         parameters = pika.ConnectionParameters(
             host=self.host,
             heartbeat=self.heartbeat,
-            credentials=pika.PlainCredentials(
-                self.username,
-                self.password,
-            )
         )
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
 
-        self.channel.exchange_declare(exchange='', exchange_type='direct')
-        self.queue = self.channel.queue_declare(queue='', durable=True, arguments={'x-max-priority': self.max_priority},)
-        self.channel.queue_bind(queue='', exchange='', routing_key='')
+        self.channel.exchange_declare(exchange=self.exchange_name, exchange_type=self.exchange_type)
+        self.queue = self.channel.queue_declare(queue=self.queue_name, durable=True, arguments={'x-max-priority': self.max_priority},)
+        self.channel.queue_bind(queue=self.queue_name, exchange=self.exchange_name, routing_key=self.routing_key)
 
     def _sender(self, message: str, priority: int) -> None:
         self.channel.basic_publish(
-            exchange='',
-            routing_key='',
-            body = message,
-            properties = pika.BasicProperties(priority=priority),
+            exchange=self.exchange_name,
+            routing_key=self.routing_key,
+            body=message,
+            properties=pika.BasicProperties(priority=priority),
         )
+        logger.info('Message published in requeue')
 
-    def sender(self, message: str, priority: int):
+    def sender(self, message: str, priority: int = None):
         try:
             try:
 
@@ -194,15 +187,16 @@ class CeleryRequeue(metaclass=Singleton):
             message = CeleryBackupMessage.to_instance(body.decode())
             signature(
                 message.task_name,
-                args=json.loads(message.args),
-                kwargs=json.loads(message.kwargs),
+                args=ujson.loads(message.args),
+                kwargs=ujson.loads(message.kwargs),
             ).delay()
+            logger.info('Create task on call back')
             ch.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as exp:
             logger.critical(exp, exc_info=True)
             raise exp
 
-    def requeue(self): # ye cli mikhad baray requeue kardan in ha
+    def requeue(self):
         error_message_count = self.queue.method.message_count
         if error_message_count == 0:
             # Cancel the consumer and  Close the channel and the connection
@@ -217,7 +211,6 @@ class CeleryRequeue(metaclass=Singleton):
 
             if method.delivery_tag == error_message_count:
                 break
-
 
         # Cancel the consumer and  Close the channel and the connection
         self.channel.cancel()

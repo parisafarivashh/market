@@ -23,6 +23,7 @@ django-contrib-postgres = "^0.0.1"
 celery = "^5.4.0"
 rabbitmq-server = "^0.0.1"
 redis = "^5.2.0"
+ujson = "^5.10.0"
 
 [tool.poetry.group.dev.dependencies]
 djangorestframework = "^3.15.2"
