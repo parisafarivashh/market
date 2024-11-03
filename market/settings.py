@@ -20,8 +20,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv()
 
-from django.conf.global_settings import AUTH_USER_MODEL
-
+block_ips = []
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -70,6 +69,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'authorize.middelwars.NotAllowedBlockUser',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'market.middleware.RequestLoggingMiddleware',
+    'market.middleware.LogIpMiddleware',
 ]
 
 ROOT_URLCONF = 'market.urls'
