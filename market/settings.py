@@ -133,7 +133,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'EXCEPTION_HANDLER': 'market.handler_exceptions.custom_exception_handler',
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'market.pagination.CustomPagination',
 }
 
 SIMPLE_JWT = {
@@ -227,7 +228,6 @@ LOGGING = {
         }
     },
 }
-
 
 # region rabbitmq
 CELERY_BROKER_URL = 'amqp://localhost'
