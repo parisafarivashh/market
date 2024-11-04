@@ -136,6 +136,8 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'market.handler_exceptions.custom_exception_handler',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'market.pagination.CustomPagination',
+    'DEFAULT_THROTTLE_CLASSES': ['rest_framework.throttling.ScopedRateThrottle',],
+    'DEFAULT_THROTTLE_RATES': {'anon': '1/day',}
 }
 
 SIMPLE_JWT = {
