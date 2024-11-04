@@ -20,7 +20,6 @@ class CategoryListCreateApiView(generics.ListCreateAPIView, AtomicMixin):
 
         return permission_classes
 
-
     def get_queryset(self):
         removed_at = self.request.query_params.get('removed_at')
         query = Category.objects.filter(parent__isnull=True)

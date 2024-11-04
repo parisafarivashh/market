@@ -1,9 +1,12 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.db import transaction
 
+from market.utility import delete_cache
 from ..filterset import ProductFilter
 from ..models import Attribute
 from ..models.product import Product
@@ -14,6 +17,7 @@ from .mixins import AtomicMixin
 
 
 class ProductListCreateView(generics.ListCreateAPIView, AtomicMixin):
+    key_prefix = 'list_product'
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
 
@@ -34,10 +38,16 @@ class ProductListCreateView(generics.ListCreateAPIView, AtomicMixin):
         return permission_class
 
     def perform_create(self, serializer):
+        delete_cache(self.key_prefix)
         serializer.save(creator=self.request.user)
+
+    @method_decorator(cache_page(300, key_prefix=key_prefix))
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 
 class ProductGetUpdateView(generics.RetrieveUpdateDestroyAPIView, AtomicMixin):
+    key_prefix = 'list_product'
     lookup_field = 'id'
 
     def get_queryset(self):
@@ -45,6 +55,8 @@ class ProductGetUpdateView(generics.RetrieveUpdateDestroyAPIView, AtomicMixin):
 
     @transaction.atomic()
     def dispatch(self, request, *args, **kwargs):
+        if request.method.lower() in ['put', 'patch', 'delete']:
+            delete_cache(self.key_prefix)
         return super().dispatch(request, *args, **kwargs)
 
     def get_permissions(self):

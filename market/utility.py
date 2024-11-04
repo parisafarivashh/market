@@ -1,5 +1,6 @@
+from django.core.cache import cache
 
-
+from market import settings
 
 
 def get_or_none(model, _id: int):
@@ -8,6 +9,13 @@ def get_or_none(model, _id: int):
         return instance
     except model.DoesNotExist():
         return None
+
+def delete_cache(key_prefix: str):
+    """
+    Delete all cache keys with the given prefix.
+    """
+    keys_pattern = f"views.decorators.cache.cache_*.{key_prefix}.*.{settings.LANGUAGE_CODE}.{settings.TIME_ZONE}"
+    cache.delete_pattern(keys_pattern)
 
 
 #class Singleton:
