@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from graphene_django.views import GraphQLView
+
+from market.schema import schema
 
 
 def trigger_error(request):
@@ -26,6 +30,7 @@ urlpatterns = [
     path('user/', include('authorize.urls')),
     path('api/', include('core.urls')),
     path('sentry-debug/', trigger_error),
+    path('graphql/', csrf_exempt(GraphQLView.as_view(schema=schema, graphiql=True))),
 ]
 
 if settings.DEBUG:

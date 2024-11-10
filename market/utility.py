@@ -1,3 +1,5 @@
+from functools import wraps
+
 import ujson
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -57,3 +59,15 @@ def send_response_to_websocket(response, request):
                 "data": ujson.dumps({path: response.data}),
             },
         )
+
+
+def login_required(resolver_func):
+
+    @wraps(resolver_func)
+    def wrapper_func(self, info, *args, **kwargs):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception("Authentication credentials were not provided.")
+        return resolver_func(self, info, *args, **kwargs)
+    return wrapper_func
+
