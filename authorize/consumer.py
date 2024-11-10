@@ -1,3 +1,4 @@
+import ujson
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 
@@ -5,7 +6,7 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         user = self.scope['user']
-        self.group_name = 'aaa'
+        self.group_name = ''
         if user.is_authenticated:
             self.group_name = f'user__{user.id}'
             await self.channel_layer.group_add(self.group_name, self.channel_name)
@@ -17,9 +18,8 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def receive(self, text_data):
-        # Here, you could handle incoming messages if necessary
-        print('received text data')
-        await self.send(text_data={'message': text_data})
+        # Send the same message back to the WebSocket
+        await self.send_json({'message': text_data})
 
     async def send_data(self, event):
         await self.send(text_data=event["data"])
