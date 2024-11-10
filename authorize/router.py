@@ -5,5 +5,5 @@ from .consumer import UserConsumer
 
 websocket_urlpatterns = [
     # route for MySyncConsumer
-    path('user/',UserConsumer.as_asgi()),
+    path('ws/user/',UserConsumer.as_asgi()),
 ]

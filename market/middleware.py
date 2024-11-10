@@ -6,16 +6,19 @@ from django.utils.deprecation import MiddlewareMixin
 from rest_framework import status
 
 from .settings import block_ips
-
+from .utility import send_response_to_websocket
 
 logger = logging.getLogger('django')
 
 
-class RequestLoggingMiddleware(MiddlewareMixin):
+class SendResponseToWebsocketUserMiddleware(MiddlewareMixin):
 
     def __call__(self, request, *args, **kwargs):
         start_time = time.time()
         response = self.get_response(request)
+
+        send_response_to_websocket(response, request)
+
         end_time = time.time()
         duration = end_time - start_time
 

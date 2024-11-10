@@ -1,3 +1,6 @@
+import ujson
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.core.cache import cache
 
 from market import settings
@@ -38,3 +41,16 @@ class Singleton(type):
 
         return cls._instances[cls]
 
+
+def send_response_to_websocket(response, request):
+
+        channel_layer = get_channel_layer()
+        path = request.path.replace('/api/', '')
+        path = f"{request.method.lower()}_{path}".replace('/', '_')
+        async_to_sync(channel_layer.group_send)(
+            f"user__{request.user.id}",
+            {
+                "type": "send_data",
+                "data": ujson.dumps({path: response.data}),
+            },
+        )

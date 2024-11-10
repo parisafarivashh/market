@@ -20,7 +20,6 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        print(validated_data)
         attributes = validated_data.pop('attributes', None)
         variants = validated_data.pop('variants', None)
 

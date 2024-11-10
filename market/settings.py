@@ -69,7 +69,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'authorize.middelwars.NotAllowedBlockUser',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'market.middleware.RequestLoggingMiddleware',
+    'market.middleware.SendResponseToWebsocketUserMiddleware',
     'market.middleware.LogIpMiddleware',
 ]
 
@@ -142,7 +142,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "SIGNING_KEY": "5ahp8kseKOVB_w",
+    "SIGNING_KEY": SECRET_KEY,
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
 }
