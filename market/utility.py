@@ -2,6 +2,7 @@ import ujson
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.core.cache import cache
+from rest_framework.response import Response
 
 from market import settings
 
@@ -43,6 +44,8 @@ class Singleton(type):
 
 
 def send_response_to_websocket(response, request):
+        if not isinstance(response, Response):
+            return
 
         channel_layer = get_channel_layer()
         path = request.path.replace('/api/', '')
