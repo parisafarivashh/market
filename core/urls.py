@@ -4,7 +4,7 @@ from .views import CategoryListCreateApiView, ProductListCreateView, \
     ProductGetUpdateView, VariantListCreateView, VariantDetailsView, \
     AttributeCreateView, AttributeDetailsView, AddCartView, CartView, \
     RemoveCartView, UpdateCartView, PaymentView, OrderView
-
+from .views.payment import PaymentCallbackView
 
 urlpatterns = [
     path('categories', CategoryListCreateApiView.as_view(), name='list_create_category'),
@@ -24,6 +24,7 @@ urlpatterns = [
     path('cart', CartView.as_view(), name='list_cart'),
 
     path('payment', PaymentView.as_view(), name='payment'),
+    path('payment-callback/', PaymentCallbackView.as_view(), name='callback'),
     path('orders', OrderView.as_view(), name='orders'),
 ]
 

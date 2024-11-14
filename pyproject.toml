@@ -33,6 +33,7 @@ graphene-django = "^3.2.2"
 update = "^0.0.1"
 cython = "<1"
 django-graphql-jwt = "^0.4.0"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 djangorestframework = "^3.15.2"
